@@ -1,0 +1,31 @@
+@page {
+	size: A4;
+	margin: 1cm;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+}
+
+th {
+    border-bottom: 1px solid black;
+    border-left: none;
+    border-right: none;
+    padding: 0.5em;
+    text-align: left;
+}
+
+td {
+    border-left: none;
+    border-right: none;
+    padding: 0.5em;
+    text-align: left;
+}
