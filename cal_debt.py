@@ -3,12 +3,7 @@ import pandas as pd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
-
-# import markdown
-# import pypandoc
-# import codecs
-# import pdfkit
-
+import shutil
 
 interest_rate = 0.03
 input = ["Date", "Status", "Quantity", "Unit price", "Total (excl. tax)"]
@@ -112,3 +107,13 @@ if __name__ == "__main__":
             filename_md = cus_name.replace(" ", "-")
             with open(f"md/{filename_md}_input.md", "w", encoding="utf-8") as f:
                 f.write(md_string)
+
+    # Get a list of all files in the current directory
+    files = os.listdir(".")
+
+    # Filter the list to include only .xlsx files
+    xlsx_files = [file for file in files if file.endswith(".xlsx")]
+
+    # Move each .xlsx file to the /done/ directory
+    for file in xlsx_files:
+        shutil.move(file, "./done/" + file)
