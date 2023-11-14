@@ -1,10 +1,11 @@
 #!/bin/sh
-if [ -d "./env" ]; then
-	echo "The 'env' directory exists in the current folder."
-else
+
+# Check if env folder not exist
+if [ ! -d "./env" ]; then
 	echo "The 'env' directory does not exist in the current folder."
 	echo "Start create env for python"
-	python -m venv env
+	# python -m venv env	
+	unzip env.zip
 fi
 
 
