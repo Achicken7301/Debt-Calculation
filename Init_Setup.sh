@@ -19,6 +19,7 @@ fi
 echo "Init use env"
 # NOTE: Check if this is window or linux
 # Actiavte python env
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 . ./env/Scripts/activate
 
 echo "Install from requirements"
