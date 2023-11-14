@@ -21,3 +21,6 @@ pip install -r requirements.txt
 echo "De-activate python env"
 . deactivate
 
+
+mkdir md pdf done
+
