@@ -8,6 +8,13 @@ else
 fi
 
 
+# Check if pandoc.exe exist
+#!/bin/sh
+if [ ! -f ./pandoc.exe ]; then
+    unzip pandoc.zip
+fi
+
+
 
 echo "Init use env"
 # NOTE: Check if this is window or linux
