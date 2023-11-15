@@ -1,6 +1,6 @@
 *.xlsx
-*.md
 *.pdf
 /env/
+/md/
 *.zip
 *.exe
