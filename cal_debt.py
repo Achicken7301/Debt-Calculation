@@ -1,9 +1,13 @@
-import sys
 import pandas as pd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
 import shutil
+import pdfkit
+import markdown
+
+config = pdfkit.configuration(wkhtmltopdf="./wkhtmltox/bin/wkhtmltopdf.exe")
+
 
 interest_rate = 0.03
 input = ["Date", "Status", "Quantity", "Unit price", "Total (excl. tax)"]
@@ -28,9 +32,10 @@ def month_diff(_date):
     return months_diff
 
 
-def debt_cal(cus_name: str):
-    global md_string, total_of_all_invoice, total_of_all_invoice_debt
-    df = pd.read_excel(f"{cus_name}.xlsx")
+def debt_cal(cus_name: str) -> str:
+    md_string = ""
+    global total_of_all_invoice, total_of_all_invoice_debt
+    df = pd.read_excel(f"{cus_name}.xlsx", index_col=None)
 
     #
     df = df[df["Status"] == "Not paid"]
@@ -73,7 +78,7 @@ def debt_cal(cus_name: str):
         md_string += (
             df_by_date[
                 ["Product", "Quantity", "Unit price", "Total (excl. tax)"]
-            ].to_markdown()
+            ].to_html()
             + "\n"
         )
 
@@ -86,6 +91,29 @@ def debt_cal(cus_name: str):
         f"### Tổng tiền: {total_of_all_invoice+int(total_of_all_invoice_debt):,} VND"
     )
 
+    return md_string
+
+
+def toPdf(md_string: str):
+    css = "<link rel='stylesheet' href='pdf-styles.css'>\n"
+
+    html_string = markdown.markdown(md_string)
+    html_string = css + html_string
+
+    with open(f"html.html", "w", encoding="utf-8") as f:
+        f.write(html_string)
+
+    pdfkit.from_string(
+        html_string,
+        "test.pdf",
+        configuration=config,
+        options={"enable-local-file-access": ""},
+        css="pdf-styles.css",
+    )
+    # pdfkit.from_string(
+    #     html_string, "test.pdf", options={"enable-local-file-access": ""}
+    # )
+
 
 if __name__ == "__main__":
     cus_name = ""
@@ -93,20 +121,19 @@ if __name__ == "__main__":
         md_string = ""
         if file_name.endswith(".xlsx"):
             cus_name, _ = file_name.split(".")
-
             md_string += "**Công ty thuốc bảo vệ thực vật Nam Khang**\n\n"
             md_string += "**Địa chỉ:** 755 Nguyễn Văn Linh, Năm Trại, Tây Ninh.\n\n"
             md_string += "**Số điện thoại:** 0947381573 - Bùi Văn Tư\n\n"
 
             md_string += f"# Công nợ khách hàng **{cus_name}**\n"
 
-            debt_cal(cus_name)
+            md_string += debt_cal(cus_name)
 
-            # toPdf()
-            # print(md_string)
+            # toPdf(md_string)
+
             filename_md = cus_name.replace(" ", "-")
             with open(f"md/{filename_md}_input.md", "w", encoding="utf-8") as f:
-                f.write(md_string)
+               f.write(md_string)
 
     # Get a list of all files in the current directory
     files = os.listdir(".")
