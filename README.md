@@ -2,7 +2,7 @@
 
 This script will take customer debt table from dolibarr software, calculate with some interest rate and export to pdf file
 
-Default interest rate is 3% per month
+Default interest rate is `3%` per month
 
 `Debt = total_invoice * mons_diff * interest_rate`
 
@@ -11,16 +11,40 @@ Where `mons_diff` is the difference between invoice created date and pay date.
 
 ## How to use
 
-Save customer debt table to .xlsx file.
+Right click at `Init_setup.ps1` then `Run with PowerShell`. The setup will take time.
 
-Examples:
+File `.csv` must be seperate by tab `\t`. Open `samples file.csv` with notepad for more details.
 
-Customer's name is: `This is customer name`
+File `run.ps1` will run default setting which is: interest rate is `3%/month` and invoice pay date is `now` (the time run the script).
 
-Customer `.xlsx` file's name is: `This is customer name.xlsx`
+```powershell
+Python310\python.exe ./cal_debt.py
+./md2pdf.ps1
+```
 
-Run 1 time script `Init_Setup.sh`. Then run script `run.sh`.
+**To set invoice pay date to different one** like `04/10/2023` in `%d/%m/%Y` format.
 
-Pdf files will store into `pdf` folder which name is `This-is-customer-name.pdf.`
+```powershell
+Python310\python.exe ./cal_debt.py -dc 04/10/2023
+./md2pdf.ps1
+```
 
-`.xlsx` files will move to `done` folder after calculated.
+To set different **invoice pay date** and **no calculate interest rate**.
+
+```powershell
+Python310\python.exe ./cal_debt.py -dc 04/10/2023 -ic 0
+./md2pdf.ps1
+```
+
+To change **interest rate** to `1%/month`.
+
+```powershell
+Python310\python.exe ./cal_debt.py -dc 04/10/2023 -ic 0 -ir 0.01
+./md2pdf.ps1
+```
+
+For further infomation run
+
+```powershell
+Python310\python.exe ./cal_debt.py -h
+```
