@@ -2,5 +2,7 @@
 *.pdf
 /env/
 /md/
+/Python310/
 *.zip
 *.exe
+*.csv
