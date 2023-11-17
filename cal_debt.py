@@ -109,7 +109,7 @@ def debt_cal(
                     xlsx_header["Unit price"],
                     xlsx_header["Total (excl. tax)"],
                 ]
-            ].to_markdown(index=False)
+            ].to_markdown(index=False, colalign=("left", "left", "right", "right"))
             + "\n"
         )
         md_string += f"|Tổng cộng|||**{int(total_invoice):,}**|\n"
