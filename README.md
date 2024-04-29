@@ -1,4 +1,6 @@
-# Debt Calculation
+# Debt Calculation (new version update)
+
+![](docs/GUI.png)
 
 This script will take customer debt table from dolibarr software, calculate with some interest rate and export to pdf file
 
