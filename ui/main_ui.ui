@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>676</width>
-    <height>507</height>
+    <width>883</width>
+    <height>457</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -31,7 +31,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="cus_name">
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
@@ -45,7 +45,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_2">
+       <widget class="QLineEdit" name="cus_number">
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
@@ -59,7 +59,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDateEdit" name="dateEdit">
+       <widget class="QDateEdit" name="closing_date">
         <property name="locale">
          <locale language="Vietnamese" country="Vietnam"/>
         </property>
@@ -81,7 +81,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Interest Rate</string>
+         <string>Interest Rate (%)</string>
         </property>
        </widget>
       </item>
@@ -116,11 +116,35 @@
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Drop .xlsx or .csv file</string>
-      </property>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="2">
+       <widget class="QPushButton" name="file_generate">
+        <property name="text">
+         <string>Generate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Drop .xlsx or .csv file</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QTableWidget" name="tableWidget">
@@ -145,7 +169,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>676</width>
+     <width>883</width>
      <height>20</height>
     </rect>
    </property>

@@ -1,8 +1,22 @@
+from unicodedata import unidata_version
 from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from ui.main_ui_ui import Ui_MainWindow
+from datetime import datetime
+from enum import Enum
 import pandas as pd
+
+
+class FileFormat(Enum):
+    XLSX = 0
+    CSV = 1
+    NONE = 2
+
+
+class ErrorHandler(Enum):
+    OK = 0
+    NOT_OK = 1
 
 
 class MainWindow(QMainWindow):
@@ -11,13 +25,107 @@ class MainWindow(QMainWindow):
         self.main_ui = Ui_MainWindow()
         self.main_ui.setupUi(self)
         self.default_headers = [
-            "Unknown",
+            "-",
             "Date",
             "Product",
             "Unit Price",
             "Quantity",
             "Total",
         ]
+
+        self.is_load_file = 0
+        self.file_data = pd.DataFrame()
+
+        self.main_ui.file_generate.clicked.connect(self.file_generate_btn)
+
+    def file_generate_btn(self):
+        """Function callback when button is clicked"""
+        if self.is_load_file == 0:
+            QMessageBox.warning(
+                self,
+                "Warning",
+                "Please drag and drop file first!!!",
+                buttons=QMessageBox.Close,
+                defaultButton=QMessageBox.Close,
+            )
+            return
+
+        # Get all colums of row 0
+        list_headers = []
+        for i in range(self.column):
+            comboBox = self.main_ui.tableWidget.cellWidget(0, i)
+            list_headers.append(comboBox.currentText())
+
+        if self.check_headers_list(list_headers) == ErrorHandler.NOT_OK:
+            return ErrorHandler.NOT_OK
+
+        # Replace old header to new selected one
+        self.file_data.columns = list_headers
+        output_headers = ["Product", "Unit Price", "Quantity", "Total"]
+
+        # Start computing
+        # Find diff in months -> total -> interest -> add to pdf
+        # List all unique dates in columns
+        unique_dates = self.file_data["Date"].unique()
+        total = 0
+        total_interest = 0
+        for date in unique_dates:
+            # Find month different
+            selected_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
+            m_diff = self.month_difference(date, selected_date)
+
+            # Find total per invoice (day)
+            # print(self.file_data[self.file_data["Date"] == date])
+            df_sort_by_date = self.file_data[self.file_data["Date"] == date]
+            total_per_invoice = df_sort_by_date["Total"].sum()
+
+            # Find interest
+            interest_rate = float(self.main_ui.interest_rate.text()) / 100
+            total_interest_per_invoice = total_per_invoice * interest_rate
+            # print(f"Total interest: {total_interest}")
+
+            total += total_per_invoice
+            total_interest += total_interest_per_invoice
+
+            print(
+                f"Total Invoice: {total_per_invoice}\nTotal Interest: {total_interest}\n{df_sort_by_date[output_headers]}"
+            )
+
+    def month_difference(self, date1: str, date2: str) -> int:
+        # Convert the date strings to datetime objects
+        date1_obj = datetime.strptime(date1, "%d/%m/%Y")
+        date2_obj = datetime.strptime(date2, "%d/%m/%Y")
+
+        # Calculate the difference in months
+        diff_months = (
+            (date2_obj.year - date1_obj.year) * 12 + date2_obj.month - date1_obj.month
+        )
+
+        return diff_months
+
+    def check_headers_list(self, header_list: list) -> ErrorHandler:
+        """
+        Check if list has any more than 1 or missing some of the members
+
+        Given some examples:
+        [ "Date", "Product", "Unit Price", "Quantity", "Total"] -> return true, no duplicate && no missing any members
+        [ "Date", "Product","Date", "Unit Price", "Quantity", "Total"] -> return false, "Date" duplicate more than 1
+        [ "Date", "Unit Price", "Quantity", "Total"] -> return false, for missing "Product"
+        """
+        default_headers = ["Date", "Product", "Unit Price", "Quantity", "Total"]
+        for header in default_headers:
+            count = header_list.count(header)
+            if count == 0 or count > 1:
+                QMessageBox.warning(
+                    self,
+                    "Warning",
+                    f"Not selected headers at row 1\nor duplicate headers\n(Header {header})",
+                    buttons=QMessageBox.Close,
+                    defaultButton=QMessageBox.Close,
+                )
+                return ErrorHandler.NOT_OK
+
+        return ErrorHandler.OK
 
     def dragEnterEvent(self, event: QDragEnterEvent | None) -> None:
         if event.mimeData().hasUrls():
@@ -29,79 +137,107 @@ class MainWindow(QMainWindow):
         return super().dragMoveEvent(a0)
 
     def dropEvent(self, event: QDropEvent) -> None:
-        """Process file path when drop
+        """Process file path when drop.\n
+        NOTE: The whole control flow is in this method!!!
 
         Args:
             event (QDropEvent):
         """
-        print("This is drop event")
+
+        # I better refactor this code for better maintenance
         if event.mimeData().hasUrls():
             event.setDropAction(Qt.CopyAction)
             event.accept()
             urls = event.mimeData().urls()
             for url in urls:
                 if url.isLocalFile():
-                    current_file = str(url.toLocalFile())
-                    self.check_file(current_file)
+                    file_abs_path = str(url.toLocalFile())
+                    file_format = self.check_file_format(file_abs_path)
+
+                    # File format handler error
+                    if file_format == FileFormat.NONE:
+                        # Create dialog warning
+                        QMessageBox.warning(
+                            self,
+                            "Warning",
+                            "This file is NOT .xlsx or .csv format\nPlease try again!!!",
+                            buttons=QMessageBox.Close,
+                            # buttons=QMessageBox.Discard | QMessageBox.NoToAll | QMessageBox.Ignore,
+                            defaultButton=QMessageBox.Close,
+                        )
+                        return
+
+                    # Load file to table
+                    self.load_file_to_table(file_abs_path, file_format)
                 else:
                     print("This is something else file")
                     print(str(url.toString()))
         else:
             event.ignore()
 
-    def check_file(self, file_path: str):
-        """Check file if .xlsx or .csv
+    def check_file_format(self, file_path: str) -> FileFormat:
+        """_Check file if .xlsx or .csv format
 
         Args:
-            file_path (str): file absolute path
+            file_path (str): Absolute path
+
+        Returns:
+            FileFormat: XLSX or CSV or NONE
         """
         # Find the index of the last dot
         last_dot_index = file_path.rfind(".")
         ext = file_path[last_dot_index:]
 
         if ext == ".xlsx":
-            print("This file is .xlsx")
-            # create table, header is drop box
-            self.load_file_to_table(file_path, ext)
+            return FileFormat.XLSX
         elif ext == ".csv":
-            print("This file is .csv")
-            # create table, header is drop box
-            self.load_file_to_table(file_path, ext)
+            return FileFormat.CSV
         else:
-            # Create dialog warning
-            print("This is either .xlsx nor .csv")
+            return FileFormat.NONE
 
-    def load_file_to_table(self, file_path: str, type: str):
-        if type == ".xlsx":
+    def load_file_to_table(self, file_path: str, type: FileFormat):
+        """Load data from .xlsx or .csv to tableWidget
+
+        NOTE: .csv has NOT working, YET
+
+        Args:
+            file_path (str): absolute file path
+            type (FileFormat): .xlsx or .csv
+        """
+
+        self.is_load_file = 1
+
+        if type == FileFormat.XLSX:
             # print("Start loading .xlsx")
-            df = pd.read_excel(file_path)
+            self.file_data = pd.read_excel(file_path)
 
-        if type == ".csv":
-            df = pd.read_csv(file_path)
+        if type == FileFormat.CSV:
+            # NOTE: This is not implement, YET
+            self.file_data = pd.read_csv(file_path)
 
-        rows = len(df)
-        columns = len(df.columns)
-        print(f"df has {rows} rows")
-        print(f"df has {columns} columnes")
+        self.row = len(self.file_data)
+        self.column = len(self.file_data.columns)
 
-        self.main_ui.tableWidget.setColumnCount(columns)
-        self.main_ui.tableWidget.setRowCount(rows)
-        # print(df.columns.values)
+        self.main_ui.tableWidget.setColumnCount(self.column)
+        self.main_ui.tableWidget.setRowCount(self.row)
 
-        headers = df.columns.values
+        headers = self.file_data.columns.values
 
-        for i in range(columns):
+        # Load headers
+        for i in range(self.column):
             self.main_ui.tableWidget.setHorizontalHeaderItem(
                 i, QTableWidgetItem(headers[i])
             )
 
-        for i in range(rows):
+        # Load header selections
+        for i in range(self.row):
             combobox = QComboBox()
             combobox.addItems(self.default_headers)
             self.main_ui.tableWidget.setCellWidget(0, i, combobox)
 
-        for i in range(1, rows):
-            for j in range(columns):
+        # Load data, `1` here is a every magic number, it works, sooooooooo dont ask
+        for i in range(1, self.row):
+            for j in range(self.column):
                 self.main_ui.tableWidget.setItem(
-                    i, j, QTableWidgetItem(str(df.iloc[i, j]))
+                    i, j, QTableWidgetItem(str(self.file_data.iloc[i - 1, j]))
                 )
