@@ -1,11 +1,11 @@
 /* @charset "UTF-8"; */
 
 @page {
-	size: A4;
-/*	margin-left: 2cm;
-	margin-top: 1cm;
-	margin-right: 1cm;
-	margin-bottom: 1cm;*/
+    size: A4;
+    margin-left: 2cm;
+    margin-top: 1cm;
+    margin-right: 1cm;
+    margin-bottom: 1cm;
 }
 
 body {

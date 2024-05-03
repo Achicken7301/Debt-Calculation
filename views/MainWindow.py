@@ -1,7 +1,7 @@
-from unicodedata import unidata_version
 from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QComboBox
+from PyQt5.QtCore import Qt
+from Models.Markdown import MyMarkdown
 from ui.main_ui_ui import Ui_MainWindow
 from datetime import datetime
 from enum import Enum
@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.main_ui = Ui_MainWindow()
         self.main_ui.setupUi(self)
-        self.default_headers = [
+        self.default_headers_comboBox = [
             "-",
             "Date",
             "Product",
@@ -33,8 +33,12 @@ class MainWindow(QMainWindow):
             "Total",
         ]
 
+        # self.default_headers = ["Date", "Product", "Unit Price", "Quantity", "Total"]
+        self.output_headers = ["Product", "Unit Price", "Quantity", "Total"]
+
         self.is_load_file = 0
         self.file_data = pd.DataFrame()
+        self.md = MyMarkdown()
 
         self.main_ui.file_generate.clicked.connect(self.file_generate_btn)
 
@@ -61,9 +65,7 @@ class MainWindow(QMainWindow):
 
         # Replace old header to new selected one
         self.file_data.columns = list_headers
-        output_headers = ["Product", "Unit Price", "Quantity", "Total"]
 
-        # Start computing
         # Find diff in months -> total -> interest -> add to pdf
         # List all unique dates in columns
         unique_dates = self.file_data["Date"].unique()
@@ -75,9 +77,9 @@ class MainWindow(QMainWindow):
             m_diff = self.month_difference(date, selected_date)
 
             # Find total per invoice (day)
-            # print(self.file_data[self.file_data["Date"] == date])
             df_sort_by_date = self.file_data[self.file_data["Date"] == date]
             total_per_invoice = df_sort_by_date["Total"].sum()
+            # print(self.file_data[self.file_data["Date"] == date])
 
             # Find interest
             interest_rate = float(self.main_ui.interest_rate.text()) / 100
@@ -87,14 +89,30 @@ class MainWindow(QMainWindow):
             total += total_per_invoice
             total_interest += total_interest_per_invoice
 
-            print(
-                f"Total Invoice: {total_per_invoice}\nTotal Interest: {total_interest}\n{df_sort_by_date[output_headers]}"
-            )
+            # Add to pdf
+            self.md.append(f"Invoice date {date}")
+            self.md.append(f"Total per Invoice {total_per_invoice}")
+            self.md.append(f"Total interest per invoice: {total_interest_per_invoice}")
+            self.md.append(df_sort_by_date[self.output_headers].to_html())
+
+        self.md.append(f"Total: {total}")
+        self.md.append(f"Total Interest: {total_interest}")
+        self.md.append(f"Sum(Total + Inerest): {total+total_interest}")
+        self.md.save("output")
+
+        #
+        QMessageBox.information(
+            self,
+            "Success",
+            "Output pdf successfully!!!",
+            buttons=QMessageBox.Ok,
+            defaultButton=QMessageBox.Ok,
+        )
 
     def month_difference(self, date1: str, date2: str) -> int:
         # Convert the date strings to datetime objects
-        date1_obj = datetime.strptime(date1, "%d/%m/%Y")
-        date2_obj = datetime.strptime(date2, "%d/%m/%Y")
+        date1_obj = datetime.strptime(date1, r"%d/%m/%Y")
+        date2_obj = datetime.strptime(date2, r"%d/%m/%Y")
 
         # Calculate the difference in months
         diff_months = (
@@ -125,6 +143,17 @@ class MainWindow(QMainWindow):
                 )
                 return ErrorHandler.NOT_OK
 
+        # TODO: Check confitions for data columns
+        # Check if Date is %d/%m/%Y format
+
+        # Check if Product is str
+
+        # Check if Unit Price is int or flaot
+
+        # Check if Quantity is int or float
+
+        # Check if Total is int or float
+
         return ErrorHandler.OK
 
     def dragEnterEvent(self, event: QDragEnterEvent | None) -> None:
@@ -138,7 +167,6 @@ class MainWindow(QMainWindow):
 
     def dropEvent(self, event: QDropEvent) -> None:
         """Process file path when drop.\n
-        NOTE: The whole control flow is in this method!!!
 
         Args:
             event (QDropEvent):
@@ -232,7 +260,7 @@ class MainWindow(QMainWindow):
         # Load header selections
         for i in range(self.row):
             combobox = QComboBox()
-            combobox.addItems(self.default_headers)
+            combobox.addItems(self.default_headers_comboBox)
             self.main_ui.tableWidget.setCellWidget(0, i, combobox)
 
         # Load data, `1` here is a every magic number, it works, sooooooooo dont ask

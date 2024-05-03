@@ -2,6 +2,8 @@
 
 ![](docs/GUI.png)
 
+![](docs/pdf_output.png)
+
 This script will take customer debt table from dolibarr software, calculate with some interest rate and export to pdf file
 
 Default interest rate is `3%` per month
