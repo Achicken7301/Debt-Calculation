@@ -1,22 +1,12 @@
 from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QComboBox
 from PyQt5.QtCore import Qt
+from Models.Global import ErrorHandler, FileFormat
 from Models.Markdown import MyMarkdown
+from Models.MultiLangues import MultiLanguages
 from ui.main_ui_ui import Ui_MainWindow
 from datetime import datetime
-from enum import Enum
 import pandas as pd
-
-
-class FileFormat(Enum):
-    XLSX = 0
-    CSV = 1
-    NONE = 2
-
-
-class ErrorHandler(Enum):
-    OK = 0
-    NOT_OK = 1
 
 
 class MainWindow(QMainWindow):
@@ -24,22 +14,28 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.main_ui = Ui_MainWindow()
         self.main_ui.setupUi(self)
+        self.m_lang = MultiLanguages()
+        # print(f"Trans: {self.m_lang.trans('Date')}")
+
+        # Base on default language content here will change
         self.default_headers_comboBox = [
             "-",
-            "Date",
-            "Product",
-            "Unit Price",
-            "Quantity",
-            "Total",
+            f"{self.m_lang.trans('Date')}",
+            f"{self.m_lang.trans('Product')}",
+            f"{self.m_lang.trans('Unit price')}",
+            f"{self.m_lang.trans('Quantity')}",
+            f"{self.m_lang.trans('Total (Unit price * Quantity)')}",
         ]
 
         # self.default_headers = ["Date", "Product", "Unit Price", "Quantity", "Total"]
-        self.output_headers = ["Product", "Unit Price", "Quantity", "Total"]
-
+        self.output_headers = [
+            # f"{self.m_lang.trans('Date')}",
+            f"{self.m_lang.trans('Product')}",
+            f"{self.m_lang.trans('Unit price')}",
+            f"{self.m_lang.trans('Quantity')}",
+            f"{self.m_lang.trans('Total (Unit price * Quantity)')}",
+        ]
         self.is_load_file = 0
-        self.file_data = pd.DataFrame()
-        self.md = MyMarkdown()
-
         self.main_ui.file_generate.clicked.connect(self.file_generate_btn)
 
     def file_generate_btn(self):
@@ -66,38 +62,55 @@ class MainWindow(QMainWindow):
         # Replace old header to new selected one
         self.file_data.columns = list_headers
 
-        # Find diff in months -> total -> interest -> add to pdf
+        # Find diff in months -> total -> interest -> add to pdf -> save as .pdf file
         # List all unique dates in columns
-        unique_dates = self.file_data["Date"].unique()
+        unique_dates = self.file_data[self.m_lang.trans("Date")].unique()
         total = 0
         total_interest = 0
+        self.md = MyMarkdown()
         for date in unique_dates:
             # Find month different
             selected_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
             m_diff = self.month_difference(date, selected_date)
 
             # Find total per invoice (day)
-            df_sort_by_date = self.file_data[self.file_data["Date"] == date]
-            total_per_invoice = df_sort_by_date["Total"].sum()
-            # print(self.file_data[self.file_data["Date"] == date])
+            df_sort_by_date = self.file_data[
+                self.file_data[self.m_lang.trans("Date")] == date
+            ]
+            total_per_invoice = df_sort_by_date[
+                self.m_lang.trans("Total (Unit price * Quantity)")
+            ].sum()
+            # print(self.file_data[self.file_data[self.m_lang.trans("Date")] == date])
 
             # Find interest
-            interest_rate = float(self.main_ui.interest_rate.text()) / 100
-            total_interest_per_invoice = total_per_invoice * interest_rate
+            interest_rate = float(self.main_ui.interest_rate.text()) / 100.0
+            total_interest_per_invoice = self.calc_interest(
+                total_per_invoice, interest_rate
+            )
+
             # print(f"Total interest: {total_interest}")
 
             total += total_per_invoice
             total_interest += total_interest_per_invoice
 
             # Add to pdf
-            self.md.append(f"Invoice date {date}")
-            self.md.append(f"Total per Invoice {total_per_invoice}")
-            self.md.append(f"Total interest per invoice: {total_interest_per_invoice}")
+            self.md.append(f"{self.m_lang.trans('Invoice date')}: {date}", "bold")
+            self.md.append(
+                f"{self.m_lang.trans('Total per invoice')}: {total_per_invoice}"
+            )
+            self.md.append(
+                f"{self.m_lang.trans('Total interest per invoice')}: {total_interest_per_invoice}"
+            )
             self.md.append(df_sort_by_date[self.output_headers].to_html())
 
-        self.md.append(f"Total: {total}")
-        self.md.append(f"Total Interest: {total_interest}")
-        self.md.append(f"Sum(Total + Inerest): {total+total_interest}")
+        # Save as .pdf file
+        self.md.append(f"{self.m_lang.trans('Total all invoices')}: {total} VND")
+        self.md.append(
+            f"{self.m_lang.trans('Total all interests')}: {total_interest} VND"
+        )
+        self.md.append(
+            f"{self.m_lang.trans('Sum (invoices + interests) ')}: {total+total_interest} VND"
+        )
         self.md.save("output")
 
         #
@@ -108,6 +121,12 @@ class MainWindow(QMainWindow):
             buttons=QMessageBox.Ok,
             defaultButton=QMessageBox.Ok,
         )
+
+    def calc_interest(self, total, interest):
+        if self.m_lang.get_locale() == "vi_VN":
+            return int(total * interest)
+        else:
+            return float(total * interest)
 
     def month_difference(self, date1: str, date2: str) -> int:
         # Convert the date strings to datetime objects
@@ -130,14 +149,14 @@ class MainWindow(QMainWindow):
         [ "Date", "Product","Date", "Unit Price", "Quantity", "Total"] -> return false, "Date" duplicate more than 1
         [ "Date", "Unit Price", "Quantity", "Total"] -> return false, for missing "Product"
         """
-        default_headers = ["Date", "Product", "Unit Price", "Quantity", "Total"]
-        for header in default_headers:
+
+        for header in self.output_headers:
             count = header_list.count(header)
             if count == 0 or count > 1:
                 QMessageBox.warning(
                     self,
-                    "Warning",
-                    f"Not selected headers at row 1\nor duplicate headers\n(Header {header})",
+                    f"{self.m_lang.trans('Warning')}",
+                    f"Not selected headers at row 1\nor duplicate headers\n({header})",
                     buttons=QMessageBox.Close,
                     defaultButton=QMessageBox.Close,
                 )
@@ -187,8 +206,8 @@ class MainWindow(QMainWindow):
                         # Create dialog warning
                         QMessageBox.warning(
                             self,
-                            "Warning",
-                            "This file is NOT .xlsx or .csv format\nPlease try again!!!",
+                            f"{self.m_lang.trans('Warning')}",
+                            f"{self.m_lang.trans('This file is NOT .xlsx or .csv format')}",
                             buttons=QMessageBox.Close,
                             # buttons=QMessageBox.Discard | QMessageBox.NoToAll | QMessageBox.Ignore,
                             defaultButton=QMessageBox.Close,
@@ -233,6 +252,7 @@ class MainWindow(QMainWindow):
             type (FileFormat): .xlsx or .csv
         """
 
+        self.file_data = pd.DataFrame()
         self.is_load_file = 1
 
         if type == FileFormat.XLSX:

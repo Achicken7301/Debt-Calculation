@@ -1,0 +1,15 @@
+{
+    "Date": "Ngày",
+    "Product": "Sản phẩm",
+    "Unit price": "Đơn giá",
+    "Quantity": "Số lượng",
+    "Total (Unit price * Quantity)": "Tổng (Đơn giá * Số  lượng)",
+    "Invoice date": "Ngày hóa đơn",
+    "Total per invoice": "Tổng hóa đơn",
+    "Total interest per invoice": "Tổng lãi suất hóa đơn",
+    "Total all invoices": "Tổng các hóa đơn",
+    "Total all interests": "Tổng các lãi suất",
+    "Sum (invoices + interests) ": "Tổng tiền",
+    "Warning": "Cảnh báo",
+    "This file is NOT .xlsx or .csv format": "Đây không phải file định dạng .xlsx hoặc .csv."
+}
