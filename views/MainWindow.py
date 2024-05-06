@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
             # Find interest
             interest_rate = float(self.main_ui.interest_rate.text()) / 100.0
             total_interest_per_invoice = self.calc_interest(
-                total_per_invoice, interest_rate
+                total_per_invoice, interest_rate, m_diff
             )
 
             # print(f"Total interest: {total_interest}")
@@ -149,11 +149,11 @@ class MainWindow(QMainWindow):
 
         return df
 
-    def calc_interest(self, total, interest):
+    def calc_interest(self, total, interest, _m_diff):
         if self.m_lang.get_locale() == "vi_VN":
-            return int(total * interest)
+            return int(total * interest * _m_diff)
         else:
-            return float(total * interest)
+            return float(total * interest * _m_diff)
 
     def month_difference(self, date1: str, date2: str) -> int:
         # Convert the date strings to datetime objects

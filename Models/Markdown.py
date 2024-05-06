@@ -12,11 +12,16 @@ class MyMarkdown:
         self.content = ""
         self.store_name = ""
         self.store_addr = ""
+        self.store_street = ""
+        self.store_district = ""
+        self.store_provinces = ""
+        self.store_city = ""
         self.store_phone_number = ""
         self.css = """
             body{
-                font-family: Liberation Serif;
+                font-family: Lora;
             }
+            
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -40,8 +45,8 @@ class MyMarkdown:
         self.content += "<html>"
         self.content = "<style>" + self.css + "</style>\r\n"
         self.content += f"""
-<body style="font-family: Liberation Serif;">
-<table class="dataframe">
+<body >
+<table class="dataframe" style="align: center;">
     <tbody>
         <tr>
             <td style="text-align: left;">
@@ -52,7 +57,9 @@ class MyMarkdown:
             </td>
             <td style="text-align: right;">
                 {self.store_name} <br>
-                {self.store_addr}<br>
+                {self.store_street}<br>
+                {self.store_district}<br>
+                {self.store_city}<br>
                 {self.store_phone_number} <br>
             </td>
         </tr>
@@ -63,8 +70,7 @@ class MyMarkdown:
         {self.m_lang.trans("Customer debt")}
     </h2>
 <div>
-<p style="text-align: right;">{self.m_lang.trans("Closing date")}: </p>
-\r\n<br>
+<p style="text-align: left;">{self.m_lang.trans("Closing date")}: </p><br>
         """
 
     def save2pdf(self, file_name: str):
@@ -102,6 +108,10 @@ class MyMarkdown:
         config.read(".conf")  # Replace 'settings.conf' with your file name
         self.store_name = config["STORE"]["name"]
         self.store_addr = config["STORE"]["addr"]
+        self.store_street = config["STORE"]["street"]
+        self.store_district = config["STORE"]["district"]
+        self.store_province = config["STORE"]["province"]
+        self.store_city = config["STORE"]["city"]
         self.store_phone_number = config["STORE"]["phone"]
 
     def save_store_infos(self):
