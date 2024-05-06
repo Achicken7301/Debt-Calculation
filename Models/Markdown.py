@@ -1,7 +1,10 @@
 from pickle import NONE
+import configparser
 import pandas as pd
 from markdown_pdf import MarkdownPdf
 from markdown_pdf import Section
+
+from Models.MultiLangues import MultiLanguages
 
 
 class MyMarkdown:
@@ -10,57 +13,80 @@ class MyMarkdown:
         self.store_name = ""
         self.store_addr = ""
         self.store_phone_number = ""
-
-        self.get_store_name()
         self.css = """
-            @page {
-                size: A4;
-                margin-left: 2cm;
-                margin-top: 1cm;
-                margin-right: 1cm;
-                margin-bottom: 1cm;
+            body{
+                font-family: Liberation Serif;
             }
-            body {
-                font-family: Open Sans;
-            }
-
             table {
                 width: 100%;
-                border: none;
                 border-collapse: collapse;
                 border-bottom: 1px solid black;
                 border-top: 1px solid black;
-            }
-
-            th {
-                padding: 0.5em;
-                border: none;
-                text-align: left;
+                align: center;
             }
 
             td {
-                border: none;
                 padding: 0.5em;
-                text-align: left;
+                text-align: right;
             }
             """
-        self.content = "<style>" + self.css + "</style>"
+        self.m_lang = MultiLanguages()
+        self.get_store_name()
         self.pdf = MarkdownPdf()
 
-    def save(self, file_name: str):
-        self.pdf.meta["title"] = file_name
+        self.store_init()
+
+    def store_init(self):
+        self.content += "<html>"
+        self.content = "<style>" + self.css + "</style>\r\n"
+        self.content += f"""
+<body style="font-family: Liberation Serif;">
+<table class="dataframe">
+    <tbody>
+        <tr>
+            <td style="text-align: left;">
+                {self.m_lang.trans("Customer name")}: <br>
+                {self.m_lang.trans("Customer books number")}: <br>
+                {self.m_lang.trans("Customer address")}: <br>
+                {self.m_lang.trans("Customer phone")}: <br>
+            </td>
+            <td style="text-align: right;">
+                {self.store_name} <br>
+                {self.store_addr}<br>
+                {self.store_phone_number} <br>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div class="dataframe">
+    <h2 style="text-align: center;">
+        {self.m_lang.trans("Customer debt")}
+    </h2>
+<div>
+<p style="text-align: right;">{self.m_lang.trans("Closing date")}: </p>
+\r\n<br>
+        """
+
+    def save2pdf(self, file_name: str):
+        self.content += "</body>"
+        self.content += "</html>"
         self.pdf.add_section(Section(self.content, toc=False))
+
+        self.pdf.meta["title"] = file_name
         self.pdf.save(f"{file_name}.pdf")
 
-        # with open(f"md/{file_name}", "w", encoding="utf-8") as f:
-        #     f.write(self.content)
+    # def save(self, cus_name: str, cus_number: str):
+    #     pass
 
     def append(self, data: str, style=NONE):
         if style == "bold":
             self.content += "<strong>"
             self.content += data
             self.content += "</strong>"
-
+        elif style == "align-left":
+            self.content += "<p style='text-align: left;'>"
+            self.content += data
+            self.content += "</p>"
         else:
             self.content += data
 
@@ -72,11 +98,11 @@ class MyMarkdown:
         self.store_phone_number = phone_number
 
     def get_store_name(self):
-        """Get store infos which saved in .csv for .xlsx file"""
-        # Access to .csv or .xlsx file
-
-        # Sign to store infos by using `set_store_info()`
-        pass
+        config = configparser.ConfigParser()
+        config.read(".conf")  # Replace 'settings.conf' with your file name
+        self.store_name = config["STORE"]["name"]
+        self.store_addr = config["STORE"]["addr"]
+        self.store_phone_number = config["STORE"]["phone"]
 
     def save_store_infos(self):
         """Save store infos into .csv or .xlsx file"""

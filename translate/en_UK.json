@@ -1,8 +1,8 @@
 {
-    "Date": "Ngày",
-    "Closing date": "Ngày đáo hạn",
-    "Product": "Sản phẩm",
-    "Unit price": "Đơn giá",
+    "Date": "Date",
+    "Closing date": "Closing date",
+    "Product": "Product",
+    "Unit price": "Unit price",
     "Quantity": "Số lượng",
     "Total (Unit price * Quantity)": "Tổng (Đơn giá * Số  lượng)",
     "Invoice date": "Ngày hóa đơn",
@@ -13,11 +13,6 @@
     "Total all interests": "Tổng các lãi suất",
     "Sum (invoices + interests) ": "Tổng tiền",
     "Warning": "Cảnh báo",
-    "Customer debt": "Công nợ khách hàng",
     "Phone number": "Số điện thoại",
-    "Customer name": "Tên khách hàng",
-    "Customer books number": "Số khách hàng trong sổ",
-    "Customer address": "Địa chỉ khách hàng",
-    "Customer phone": "Số điện thoại khách hàng",
-    "This file is NOT .xlsx or .csv format\r\nPlease try again": "Đây không phải file định dạng .xlsx hoặc .csv.\r\nVui lòng thử lại!!!"
+    "This file is NOT .xlsx or .csv format": "Đây không phải file định dạng .xlsx hoặc .csv."
 }

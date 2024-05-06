@@ -1,11 +1,13 @@
-from markdown_pdf import MarkdownPdf
-from markdown_pdf import Section
+import pandas as pd
+import numpy as np
+import matplotlib as mpl
 
-pdf = MarkdownPdf(toc_level=2)
-pdf.add_section(Section("# Title\n", toc=False))
-pdf.add_section(Section("# Head1\n\nbody\n"))
-pdf.add_section(Section("## Head2\n\n### Head3\n\n"))
+# Sample DataFrame
+data = {"Product": ["A", "B", "C"], "Unit Price": [10.5, 20.75, 15.99]}
 
-pdf.meta["title"] = "User Guide"
+df = pd.DataFrame(data)
 
-pdf.save("guide.pdf")
+# Format 'Unit Price' column as currency
+df["Unit Price"] = df["Unit Price"].map("${:,.2f}".format)
+
+print(df)

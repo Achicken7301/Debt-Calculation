@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
         self.main_ui = Ui_MainWindow()
         self.main_ui.setupUi(self)
         self.m_lang = MultiLanguages()
-        # print(f"Trans: {self.m_lang.trans('Date')}")
+        self.col_format = {f"{self.m_lang.trans('Unit price')}": "{:,}"}
 
         # Base on default language content here will change
         self.default_headers_comboBox = [
@@ -27,9 +27,7 @@ class MainWindow(QMainWindow):
             f"{self.m_lang.trans('Total (Unit price * Quantity)')}",
         ]
 
-        # self.default_headers = ["Date", "Product", "Unit Price", "Quantity", "Total"]
         self.output_headers = [
-            # f"{self.m_lang.trans('Date')}",
             f"{self.m_lang.trans('Product')}",
             f"{self.m_lang.trans('Unit price')}",
             f"{self.m_lang.trans('Quantity')}",
@@ -96,22 +94,32 @@ class MainWindow(QMainWindow):
             # Add to pdf
             self.md.append(f"{self.m_lang.trans('Invoice date')}: {date}", "bold")
             self.md.append(
-                f"{self.m_lang.trans('Total per invoice')}: {total_per_invoice}"
+                f"{self.m_lang.trans('Total per invoice')}: {total_per_invoice:,} VND"
             )
             self.md.append(
-                f"{self.m_lang.trans('Total interest per invoice')}: {total_interest_per_invoice}"
+                f"{self.m_lang.trans('Total interest per invoice')}: {total_interest_per_invoice:,} VND ({self.m_lang.trans('Interest months difference')}: {m_diff})"
             )
+
+            # Add style for dataframe
+            df_sort_by_date = self.cols_format(df_sort_by_date)
             self.md.append(df_sort_by_date[self.output_headers].to_html())
 
         # Save as .pdf file
-        self.md.append(f"{self.m_lang.trans('Total all invoices')}: {total} VND")
         self.md.append(
-            f"{self.m_lang.trans('Total all interests')}: {total_interest} VND"
+            f"{self.m_lang.trans('Total all invoices')}: {total:,} VND", "align-left"
         )
+
         self.md.append(
-            f"{self.m_lang.trans('Sum (invoices + interests) ')}: {total+total_interest} VND"
+            f"{self.m_lang.trans('Total all interests')}: {total_interest:,} VND",
+            "align_left",
         )
-        self.md.save("output")
+
+        self.md.append(
+            f"{self.m_lang.trans('Sum (invoices + interests) ')}: {total+total_interest:,} VND",
+            "align_left",
+        )
+
+        self.md.save2pdf("output")
 
         #
         QMessageBox.information(
@@ -121,6 +129,25 @@ class MainWindow(QMainWindow):
             buttons=QMessageBox.Ok,
             defaultButton=QMessageBox.Ok,
         )
+
+    def cols_format(self, df: pd.DataFrame) -> pd.DataFrame:
+        """This magical function will format dataframe columes
+
+        Args:
+            df (pd.DataFrame): _description_
+
+        Returns:
+            pd.DataFrame: _description_
+        """
+        df.loc[:, self.m_lang.trans("Unit price")] = df.loc[
+            :, self.m_lang.trans("Unit price")
+        ].map("{:,}".format)
+
+        df.loc[:, self.m_lang.trans("Total (Unit price * Quantity)")] = df.loc[
+            :, self.m_lang.trans("Total (Unit price * Quantity)")
+        ].map("{:,}".format)
+
+        return df
 
     def calc_interest(self, total, interest):
         if self.m_lang.get_locale() == "vi_VN":
@@ -202,12 +229,15 @@ class MainWindow(QMainWindow):
                     file_format = self.check_file_format(file_abs_path)
 
                     # File format handler error
+                    temp_text = self.m_lang.trans(
+                        "This file is NOT .xlsx or .csv format\r\nPlease try again"
+                    )
                     if file_format == FileFormat.NONE:
                         # Create dialog warning
                         QMessageBox.warning(
                             self,
                             f"{self.m_lang.trans('Warning')}",
-                            f"{self.m_lang.trans('This file is NOT .xlsx or .csv format')}",
+                            temp_text,
                             buttons=QMessageBox.Close,
                             # buttons=QMessageBox.Discard | QMessageBox.NoToAll | QMessageBox.Ignore,
                             defaultButton=QMessageBox.Close,
