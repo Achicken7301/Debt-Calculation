@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(883, 457)
+        MainWindow.resize(663, 528)
         MainWindow.setAcceptDrops(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAcceptDrops(False)
@@ -27,6 +27,7 @@ class Ui_MainWindow(object):
         self.label_5.setObjectName("label_5")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_5)
         self.cus_name = QtWidgets.QLineEdit(self.centralwidget)
+        self.cus_name.setText("")
         self.cus_name.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.cus_name.setObjectName("cus_name")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.cus_name)
@@ -85,7 +86,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.tableWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 883, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 663, 20))
         self.menubar.setObjectName("menubar")
         self.menu_Files = QtWidgets.QMenu(self.menubar)
         self.menu_Files.setObjectName("menu_Files")

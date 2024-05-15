@@ -27,4 +27,5 @@ class MultiLanguages:
         ErrorHandler.OK
 
     def trans(self, text: str) -> str:
+        # TODO: check condition if there no corect text
         return self.trans_data[text]
