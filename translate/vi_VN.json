@@ -19,5 +19,6 @@
     "Customer books number": "Số khách hàng trong sổ",
     "Customer address": "Địa chỉ khách hàng",
     "Customer phone": "Số điện thoại khách hàng",
+    "Please input customer name": "Vui lòng nhập tên khách hàng.",
     "This file is NOT .xlsx or .csv format\r\nPlease try again": "Đây không phải file định dạng .xlsx hoặc .csv.\r\nVui lòng thử lại!!!"
 }
