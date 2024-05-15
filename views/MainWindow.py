@@ -60,12 +60,27 @@ class MainWindow(QMainWindow):
         # Replace old header to new selected one
         self.file_data.columns = list_headers
 
+        cus_name = self.main_ui.cus_name.text()
+        cus_book_number = self.main_ui.cus_number.text()
+        closing_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
+        if len(cus_name) == 0:
+            QMessageBox.warning(
+                self,
+                self.m_lang.trans("Warning"),
+                self.m_lang.trans("Please input customer name"),
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+
+            return
+
         # Find diff in months -> total -> interest -> add to pdf -> save as .pdf file
         # List all unique dates in columns
         unique_dates = self.file_data[self.m_lang.trans("Date")].unique()
         total = 0
         total_interest = 0
-        self.md = MyMarkdown()
+
+        self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
         for date in unique_dates:
             # Find month different
             selected_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
@@ -119,7 +134,7 @@ class MainWindow(QMainWindow):
             "align_left",
         )
 
-        self.md.save2pdf("output")
+        self.md.save2pdf(f"{cus_name}_{cus_book_number}")
 
         #
         QMessageBox.information(

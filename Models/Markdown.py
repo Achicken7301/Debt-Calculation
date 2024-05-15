@@ -8,7 +8,9 @@ from Models.MultiLangues import MultiLanguages
 
 
 class MyMarkdown:
-    def __init__(self) -> None:
+    def __init__(
+        self, _cus_name="Unknown", _cus_number="001", _closing_date="01/01/2001"
+    ) -> None:
         self.content = ""
         self.store_name = ""
         self.store_addr = ""
@@ -19,15 +21,16 @@ class MyMarkdown:
         self.store_phone_number = ""
         self.css = """
             body{
-                font-family: Lora;
+                font-family: Arial, Times New Roman;
             }
             
             table {
                 width: 100%;
+                margin-left: auto;
+                margin-right: auto;
                 border-collapse: collapse;
                 border-bottom: 1px solid black;
                 border-top: 1px solid black;
-                align: center;
             }
 
             td {
@@ -39,47 +42,55 @@ class MyMarkdown:
         self.get_store_name()
         self.pdf = MarkdownPdf()
 
-        self.store_init()
+        self.store_init(_cus_name, _cus_number, _closing_date)
 
-    def store_init(self):
+    def store_init(self, _cus_name, _cus_number, _closing_date):
         self.content += "<html>"
         self.content = "<style>" + self.css + "</style>\r\n"
         self.content += f"""
 <body >
-<table class="dataframe" style="align: center;">
-    <tbody>
+<div style="margin: auto;">
+<table>
+    <tbody >
         <tr>
             <td style="text-align: left;">
-                {self.m_lang.trans("Customer name")}: <br>
-                {self.m_lang.trans("Customer books number")}: <br>
+                {self.m_lang.trans("Customer name")}: {_cus_name}.<br>
+                {self.m_lang.trans("Customer books number")}: {_cus_number}.<br>
                 {self.m_lang.trans("Customer address")}: <br>
                 {self.m_lang.trans("Customer phone")}: <br>
             </td>
             <td style="text-align: right;">
-                {self.store_name} <br>
+                {self.store_name}<br>
                 {self.store_street}<br>
                 {self.store_district}<br>
                 {self.store_city}<br>
-                {self.store_phone_number} <br>
+                {self.store_phone_number}<br>
             </td>
         </tr>
     </tbody>
 </table>
+</div>
 <div class="dataframe">
     <h2 style="text-align: center;">
         {self.m_lang.trans("Customer debt")}
     </h2>
-<div>
-<p style="text-align: left;">{self.m_lang.trans("Closing date")}: </p><br>
+</div>
+<p style="text-align: right;">{self.m_lang.trans("Closing date")}: {_closing_date}.</p><br>
         """
 
     def save2pdf(self, file_name: str):
+        # file_name format before save
+        # Remove commas
+        no_commas = file_name.replace(",", "")
+        # Replace spaces with underscores
+        file_name_formatted_string = no_commas.replace(" ", "_")
+
         self.content += "</body>"
         self.content += "</html>"
         self.pdf.add_section(Section(self.content, toc=False))
 
         self.pdf.meta["title"] = file_name
-        self.pdf.save(f"{file_name}.pdf")
+        self.pdf.save(f"{file_name_formatted_string}.pdf")
 
     # def save(self, cus_name: str, cus_number: str):
     #     pass
@@ -116,4 +127,4 @@ class MyMarkdown:
 
     def save_store_infos(self):
         """Save store infos into .csv or .xlsx file"""
-        pass
+        # pass
