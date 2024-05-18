@@ -2,7 +2,7 @@ from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QComboBox
 from PyQt5.QtCore import Qt
 from Models.Global import ErrorHandler, FileFormat
-from Models.Markdown import MyMarkdown
+from Models.Markdown import MyMarkdown, Style
 from Models.MultiLangues import MultiLanguages
 from ui.main_ui_ui import Ui_MainWindow
 from datetime import datetime
@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
 
     def file_generate_btn(self):
         """Function callback when button is clicked"""
+        # Check file confition
         if self.is_load_file == 0:
             QMessageBox.warning(
                 self,
@@ -54,12 +55,14 @@ class MainWindow(QMainWindow):
             comboBox = self.main_ui.tableWidget.cellWidget(0, i)
             list_headers.append(comboBox.currentText())
 
+        # Check headers list
         if self.check_headers_list(list_headers) == ErrorHandler.NOT_OK:
             return ErrorHandler.NOT_OK
 
         # Replace old header to new selected one
         self.file_data.columns = list_headers
 
+        # Create local variable
         cus_name = self.main_ui.cus_name.text()
         cus_book_number = self.main_ui.cus_number.text()
         closing_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
@@ -107,33 +110,46 @@ class MainWindow(QMainWindow):
             total_interest += total_interest_per_invoice
 
             # Add to pdf
-            self.md.append(f"{self.m_lang.trans('Invoice date')}: {date}", "bold")
-            self.md.append(
-                f"{self.m_lang.trans('Total per invoice')}: {total_per_invoice:,} VND"
-            )
-            self.md.append(
-                f"{self.m_lang.trans('Total interest per invoice')}: {total_interest_per_invoice:,} VND ({self.m_lang.trans('Interest months difference')}: {m_diff})"
-            )
+            self.md.append("<br>")
+            self.md.append(f"{date}", Style.BOLD)
 
             # Add style for dataframe
             df_sort_by_date = self.cols_format(df_sort_by_date)
-            self.md.append(df_sort_by_date[self.output_headers].to_html())
 
-        # Save as .pdf file
-        self.md.append(
-            f"{self.m_lang.trans('Total all invoices')}: {total:,} VND", "align-left"
+            # Add total/interest
+            _temp_table = ""
+            _temp_table += (
+                df_sort_by_date[self.output_headers].to_markdown(
+                    index=False, colalign=("left", "left", "right", "right")
+                )
+                + "\r\n"
+            )
+            _temp_table += f"||||<hr style='margin-right:0; width: 75%'>|\r\n"
+            _temp_table += f"||||{total_per_invoice:,}|\r\n"
+            # _temp_table += (
+            #     f"||||Lãi {m_diff} tháng: {total_interest_per_invoice:,}|\r\n"
+            # )
+            self.md.append(_temp_table, Style.TABLE)
+            self.md.summary_append(
+                [
+                    date,
+                    f"{total_per_invoice:,}",
+                    f"x{m_diff}",
+                    f"{total_interest_per_invoice:,}",
+                    "",
+                ]
+            )
+
+        self.md.summary_append(["", "<hr>", "", "<hr>", ""])
+        self.md.summary_append(
+            [
+                "",
+                f"{total:,}",
+                "+",
+                f"{total_interest:,}",
+                f"= {(total + total_interest):,}",
+            ]
         )
-
-        self.md.append(
-            f"{self.m_lang.trans('Total all interests')}: {total_interest:,} VND",
-            "align_left",
-        )
-
-        self.md.append(
-            f"{self.m_lang.trans('Sum (invoices + interests) ')}: {total+total_interest:,} VND",
-            "align_left",
-        )
-
         self.md.save2pdf(f"{cus_name}_{cus_book_number}")
 
         #
@@ -251,7 +267,7 @@ class MainWindow(QMainWindow):
                         # Create dialog warning
                         QMessageBox.warning(
                             self,
-                            f"{self.m_lang.trans('Warning')}",
+                            self.m_lang.trans("Warning"),
                             temp_text,
                             buttons=QMessageBox.Close,
                             # buttons=QMessageBox.Discard | QMessageBox.NoToAll | QMessageBox.Ignore,

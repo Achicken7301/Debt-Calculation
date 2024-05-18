@@ -1,17 +1,42 @@
-from pickle import NONE
+from ast import Mult
 import configparser
-import pandas as pd
-from markdown_pdf import MarkdownPdf
-from markdown_pdf import Section
-
+import markdown
+from pandas import DataFrame
+from weasyprint import HTML, CSS
 from Models.MultiLangues import MultiLanguages
+
+
+class Style(enumerate):
+    TABLE = 0
+    ALIGN_LEFT = 1
+    BOLD = 2
+
+    # table {
+    #     width: 100%;
+    #     margin-left: auto;
+    #     margin-right: auto;
+    #     border-collapse: collapse;
+    #     border-bottom: 1px solid black;
+    #     border-top: 1px solid black;
+    # }
 
 
 class MyMarkdown:
     def __init__(
         self, _cus_name="Unknown", _cus_number="001", _closing_date="01/01/2001"
     ) -> None:
-        self.content = ""
+        self.m_lang = MultiLanguages()
+        self.html_summary = DataFrame(
+            columns=[
+                self.m_lang.trans("Date"),
+                self.m_lang.trans("Total"),
+                "m_diff",
+                "Interest",
+                "",
+            ]
+        )
+        self.html_content_body = ""
+        self.html_content_header = ""
         self.store_name = ""
         self.store_addr = ""
         self.store_street = ""
@@ -29,53 +54,36 @@ class MyMarkdown:
                 margin-left: auto;
                 margin-right: auto;
                 border-collapse: collapse;
-                border-bottom: 1px solid black;
-                border-top: 1px solid black;
             }
 
             td {
-                padding: 0.5em;
+                text-align: right;
+            }
+            
+            th {
+                color: white;
                 text-align: right;
             }
             """
         self.m_lang = MultiLanguages()
         self.get_store_name()
-        self.pdf = MarkdownPdf()
 
         self.store_init(_cus_name, _cus_number, _closing_date)
 
     def store_init(self, _cus_name, _cus_number, _closing_date):
-        self.content += "<html>"
-        self.content = "<style>" + self.css + "</style>\r\n"
-        self.content += f"""
-<body >
-<div style="margin: auto;">
-<table>
-    <tbody >
-        <tr>
-            <td style="text-align: left;">
-                {self.m_lang.trans("Customer name")}: {_cus_name}.<br>
-                {self.m_lang.trans("Customer books number")}: {_cus_number}.<br>
-                {self.m_lang.trans("Customer address")}: <br>
-                {self.m_lang.trans("Customer phone")}: <br>
-            </td>
-            <td style="text-align: right;">
-                {self.store_name}<br>
-                {self.store_street}<br>
-                {self.store_district}<br>
-                {self.store_city}<br>
-                {self.store_phone_number}<br>
-            </td>
-        </tr>
-    </tbody>
-</table>
-</div>
-<div class="dataframe">
-    <h2 style="text-align: center;">
-        {self.m_lang.trans("Customer debt")}
-    </h2>
-</div>
-<p style="text-align: right;">{self.m_lang.trans("Closing date")}: {_closing_date}.</p><br>
+        self.html_content_header = "<style>" + self.css + "</style>\r\n"
+        self.html_content_header += f""" <div style="margin: auto;"> <hr> <table> <tbody > <tr> <td style="text-align: left;">
+        {self.m_lang.trans("Customer name")}: {_cus_name}.<br>
+        {self.m_lang.trans("Customer books number")}: {_cus_number}.<br>
+        {self.m_lang.trans("Customer address")}: <br>
+        {self.m_lang.trans("Customer phone")}: <br> </td> <td style="text-align: right;">
+        {self.store_name}<br>
+        {self.store_street}<br>
+        {self.store_district}<br>
+        {self.store_city}<br>
+        {self.store_phone_number}<br> </td> </tr> </tbody> </table> <hr> </div> <div class="dataframe"> <h2 style="text-align: center;">
+        {self.m_lang.trans("Customer debt")} </h2> </div>
+        <p style="text-align: right;">{self.m_lang.trans("Closing date")}: {_closing_date}.</p><br>
         """
 
     def save2pdf(self, file_name: str):
@@ -84,30 +92,47 @@ class MyMarkdown:
         no_commas = file_name.replace(",", "")
         # Replace spaces with underscores
         file_name_formatted_string = no_commas.replace(" ", "_")
+        # print(self.html_content)
+        # print(self.html_summary)
 
-        self.content += "</body>"
-        self.content += "</html>"
-        self.pdf.add_section(Section(self.content, toc=False))
+        # Convert HTML to PDF
+        summary = markdown.markdown(
+            self.html_summary.to_markdown(
+                index=False,
+                colalign=("left", "right", "center", "right", "right"),
+            ),
+            extensions=["markdown.extensions.tables"],
+        )
+        output = self.html_content_header + summary + self.html_content_body
 
-        self.pdf.meta["title"] = file_name
-        self.pdf.save(f"{file_name_formatted_string}.pdf")
+        HTML(string=output).write_pdf(
+            # "output_with_css.pdf", stylesheets=[self.css]
+            "output_with_css.pdf",
+        )
 
     # def save(self, cus_name: str, cus_number: str):
     #     pass
+    def summary_append(self, data: dict):
+        self.html_summary.loc[len(self.html_summary)] = data
 
-    def append(self, data: str, style=NONE):
-        if style == "bold":
-            self.content += "<strong>"
-            self.content += data
-            self.content += "</strong>"
+    def append(self, data: str, style: Style = None):
+        if style == Style.BOLD:
+            self.html_content_body += "<strong>"
+            self.html_content_body += data
+            self.html_content_body += "</strong>"
         elif style == "align-left":
-            self.content += "<p style='text-align: left;'>"
-            self.content += data
-            self.content += "</p>"
-        else:
-            self.content += data
+            self.html_content_body += "<p style='text-align: left;'>"
+            self.html_content_body += data
+            self.html_content_body += "</p>"
+        elif style == Style.TABLE:
+            self.html_content_body += markdown.markdown(
+                data, extensions=["markdown.extensions.tables"]
+            )
 
-        self.content += "\n\n"
+        else:
+            self.html_content_body += data
+
+        self.html_content_body += "\n\n"
 
     def set_store_infos(self, name: str, addr: str, phone_number: str):
         self.store_name = name
