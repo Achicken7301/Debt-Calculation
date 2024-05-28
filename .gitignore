@@ -6,4 +6,4 @@
 .conf
 *.exe
 *.pyc
-
+test.*
