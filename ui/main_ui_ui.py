@@ -27,7 +27,6 @@ class Ui_MainWindow(object):
         self.label_5.setObjectName("label_5")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_5)
         self.cus_name = QtWidgets.QLineEdit(self.centralwidget)
-        self.cus_name.setText("")
         self.cus_name.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.cus_name.setObjectName("cus_name")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.cus_name)
@@ -121,7 +120,9 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label_5.setText(_translate("MainWindow", "Customer Name:"))
+        self.cus_name.setText(_translate("MainWindow", "Ten"))
         self.label_6.setText(_translate("MainWindow", "Customer Number in the book"))
+        self.cus_number.setText(_translate("MainWindow", "133"))
         self.label_2.setText(_translate("MainWindow", "Closing Date"))
         self.label_3.setText(_translate("MainWindow", "Interest Rate (%)"))
         self.interest_rate.setText(_translate("MainWindow", "3"))

@@ -209,6 +209,8 @@ if __name__ == "__main__":
             with open(f"md/{filename_md}_input.md", "w", encoding="utf-8") as f:
                 f.write(md_string)
 
+    print("Generate successfully")
+
     # # Get a list of all files in the current directory
     # files = os.listdir(".")
 

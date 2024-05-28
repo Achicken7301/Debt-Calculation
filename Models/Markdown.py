@@ -48,21 +48,17 @@ class MyMarkdown:
             body{
                 font-family: Arial, Times New Roman;
             }
-            
             table {
                 width: 100%;
                 margin-left: auto;
                 margin-right: auto;
                 border-collapse: collapse;
             }
-
             td {
                 text-align: right;
             }
-            
             th {
                 color: white;
-                text-align: right;
             }
             """
         self.m_lang = MultiLanguages()
@@ -107,7 +103,7 @@ class MyMarkdown:
 
         HTML(string=output).write_pdf(
             # "output_with_css.pdf", stylesheets=[self.css]
-            "output_with_css.pdf",
+            f"{file_name_formatted_string}.pdf",
         )
 
     # def save(self, cus_name: str, cus_number: str):

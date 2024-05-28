@@ -33,7 +33,7 @@
       <item row="0" column="1">
        <widget class="QLineEdit" name="cus_name">
         <property name="text">
-         <string/>
+         <string>Ten</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -49,6 +49,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QLineEdit" name="cus_number">
+        <property name="text">
+         <string>133</string>
+        </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
