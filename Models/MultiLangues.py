@@ -21,6 +21,7 @@ class MultiLanguages:
             ErrorHandler: _description_
         """
         # TODO: Find if there self.language file in translate folder, if not return FILE_NOT_FOUND
+        language_file = f"translate/{self.language}.json"
         with open(language_file, "r", encoding="utf8") as jsonfile:
             self.trans_data = json.load(jsonfile)
 
