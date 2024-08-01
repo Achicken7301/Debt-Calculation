@@ -1,7 +1,7 @@
 {
     "Date (DD/MM/YYYY format)": "Ngày (Định dạng DD/MM/YYYY)",
     "Date": "Ngày",
-    "Closing date": "Ngày đáo hạn",
+    "Closing date": "Ngày chốt sổ",
     "Product": "Sản phẩm",
     "Unit price": "Đơn giá",
     "Quantity": "Số lượng",
@@ -21,6 +21,8 @@
     "Customer books number": "Số khách hàng trong sổ",
     "Customer address": "Địa chỉ khách hàng",
     "Customer phone": "Số điện thoại khách hàng",
+    "This file is NOT .xlsx or .csv format\r\nPlease try again": "Đây không phải file định dạng .xlsx hoặc .csv.\r\nVui lòng thử lại!!!",
     "Please input customer name": "Vui lòng nhập tên khách hàng.",
-    "This file is NOT .xlsx or .csv format\r\nPlease try again": "Đây không phải file định dạng .xlsx hoặc .csv.\r\nVui lòng thử lại!!!"
+    "Invoice detail": "Hóa đơn chi tiết",
+    "Book calc title": "Cộng sổ"
 }

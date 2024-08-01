@@ -11,15 +11,6 @@ class Style(enumerate):
     ALIGN_LEFT = 1
     BOLD = 2
 
-    # table {
-    #     width: 100%;
-    #     margin-left: auto;
-    #     margin-right: auto;
-    #     border-collapse: collapse;
-    #     border-bottom: 1px solid black;
-    #     border-top: 1px solid black;
-    # }
-
 
 class MyMarkdown:
     def __init__(
@@ -82,7 +73,7 @@ class MyMarkdown:
         <p style="text-align: right;">{self.m_lang.trans("Closing date")}: {_closing_date}.</p><br>
         """
 
-    def save2pdf(self, file_name: str):
+    def generate_file_pdf_format(self, file_name: str):
         # file_name format before save
         # Remove commas
         no_commas = file_name.replace(",", "")
@@ -124,7 +115,6 @@ class MyMarkdown:
             self.html_content_body += markdown.markdown(
                 data, extensions=["markdown.extensions.tables"]
             )
-
         else:
             self.html_content_body += data
 

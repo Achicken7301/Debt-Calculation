@@ -1,11 +1,14 @@
+import PyQt5
+import PyQt5.QtCore
 from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QComboBox
 from PyQt5.QtCore import Qt
-from Models.Global import ErrorHandler, FileFormat
+from Models.Docx import MyDocx
+from Models.Global import MY_EXPORT_FORMAT, ErrorHandler, ExportFormat, FileFormat
 from Models.Markdown import MyMarkdown, Style
 from Models.MultiLangues import MultiLanguages
 from ui.main_ui_ui import Ui_MainWindow
-from datetime import datetime
+from datetime import datetime, date
 import pandas as pd
 
 
@@ -36,6 +39,14 @@ class MainWindow(QMainWindow):
         self.is_load_file = 0
         self.main_ui.file_generate.clicked.connect(self.file_generate_btn)
 
+        self.main_ui.closing_date.setDate(PyQt5.QtCore.QDate(date.today()))
+
+        # # create variable base on export file, docx or pdf.A
+        # if MY_EXPORT_FORMAT == ExportFormat.PDF:
+        #     self.md = MyMarkdown()
+        # elif MY_EXPORT_FORMAT == ExportFormat.DOCX:
+        #     self.docx = MyDocx()
+
     def file_generate_btn(self):
         """Function callback when button is clicked"""
         # Check file confition
@@ -49,7 +60,7 @@ class MainWindow(QMainWindow):
             )
             return
 
-        # Get all colums of row 0
+        # Get all colums of row 0 for check header list
         list_headers = []
         for i in range(self.column):
             comboBox = self.main_ui.tableWidget.cellWidget(0, i)
@@ -83,7 +94,15 @@ class MainWindow(QMainWindow):
         total = 0
         total_interest = 0
 
-        self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
+        # self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
+        # Initiate temp for export pdf or docx format
+        # This is crucial cuz the whole system i use "add to temp" NOT overwrite them.
+        # So... this temp variables need to be init right here.
+        if MY_EXPORT_FORMAT == ExportFormat.PDF:
+            self.md = MyMarkdown()
+        elif MY_EXPORT_FORMAT == ExportFormat.DOCX:
+            self.docx = MyDocx()
+
         for date in unique_dates:
             # Find month different
             selected_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
@@ -109,54 +128,81 @@ class MainWindow(QMainWindow):
             total += total_per_invoice
             total_interest += total_interest_per_invoice
 
-            # Add to pdf
-            self.md.append("<br>")
-            self.md.append(f"{date}", Style.BOLD)
+            if MY_EXPORT_FORMAT == ExportFormat.PDF:
+                # Add to pdf
+                self.md.append("<br>")
+                self.md.append(f"{date}", Style.BOLD)
 
-            # Add style for dataframe
-            df_sort_by_date = self.cols_format(df_sort_by_date)
+                # Add style for dataframe
+                df_sort_by_date = self.cols_format(df_sort_by_date)
 
-            # Add total/interest
-            _temp_table = ""
-            _temp_table += (
-                df_sort_by_date[self.output_headers].to_markdown(
-                    index=False, colalign=("left", "left", "right", "right")
+                # Add total/interest
+                _temp_table = ""
+                _temp_table += (
+                    df_sort_by_date[self.output_headers].to_markdown(
+                        index=False, colalign=("left", "left", "right", "right")
+                    )
+                    + "\r\n"
                 )
-                + "\r\n"
-            )
-            _temp_table += f"||||<hr style='margin-right:0; width: 75%'>|\r\n"
-            _temp_table += f"||||{total_per_invoice:,}|\r\n"
-            # _temp_table += (
-            #     f"||||Lãi {m_diff} tháng: {total_interest_per_invoice:,}|\r\n"
-            # )
-            self.md.append(_temp_table, Style.TABLE)
-            self.md.summary_append(
-                [
+                _temp_table += f"||||<hr style='margin-right:0; width: 75%'>|\r\n"
+                _temp_table += f"||||{total_per_invoice:,}|\r\n"
+
+                self.md.append(_temp_table, Style.TABLE)
+                self.md.summary_append(
+                    [
+                        date,
+                        f"{total_per_invoice:,}",
+                        f"x{m_diff}",
+                        f"{total_interest_per_invoice:,}",
+                        "",
+                    ]
+                )
+            if MY_EXPORT_FORMAT == ExportFormat.DOCX:
+                df_sort_by_date = self.cols_format(df_sort_by_date)
+                self.docx.addTableDetail(
+                    date,
+                    f"{total_per_invoice:,}",
+                    len(self.output_headers),
+                    df_sort_by_date[self.output_headers],
+                )
+
+                self.docx.addTableSummary(
                     date,
                     f"{total_per_invoice:,}",
                     f"x{m_diff}",
                     f"{total_interest_per_invoice:,}",
                     "",
+                )
+                pass
+
+        if MY_EXPORT_FORMAT == ExportFormat.PDF:
+            self.md.summary_append(["", "<hr>", "", "<hr>", ""])
+            self.md.summary_append(
+                [
+                    "",
+                    "+",
+                    f"{total:,}",
+                    f"{total_interest:,}",
+                    f"= {(total + total_interest):,}",
                 ]
             )
-
-        self.md.summary_append(["", "<hr>", "", "<hr>", ""])
-        self.md.summary_append(
-            [
+            self.md.generate_file_pdf_format(f"{cus_name}_{cus_book_number}")
+        elif MY_EXPORT_FORMAT == ExportFormat.DOCX:
+            self.docx.addTableSummary(
                 "",
                 f"{total:,}",
                 "+",
                 f"{total_interest:,}",
                 f"= {(total + total_interest):,}",
-            ]
-        )
-        self.md.save2pdf(f"{cus_name}_{cus_book_number}")
+            )
+            self.docx.generate_file_docx_format(
+                f"{cus_name}_{cus_book_number}", closing_date
+            )
 
-        #
         QMessageBox.information(
             self,
             "Success",
-            "Output pdf successfully!!!",
+            f"Output {'DOCX' if MY_EXPORT_FORMAT == ExportFormat.DOCX else 'PDF'} file successfully!!!",
             buttons=QMessageBox.Ok,
             defaultButton=QMessageBox.Ok,
         )
@@ -167,7 +213,7 @@ class MainWindow(QMainWindow):
         Args:
             df (pd.DataFrame): _description_
 
-        Returns:
+        Returns:\n
             pd.DataFrame: _description_
         """
         df.loc[:, self.m_lang.trans("Unit price")] = df.loc[
@@ -203,9 +249,9 @@ class MainWindow(QMainWindow):
         Check if list has any more than 1 or missing some of the members
 
         Given some examples:
-        [ "Date", "Product", "Unit Price", "Quantity", "Total"] -> return true, no duplicate && no missing any members
-        [ "Date", "Product","Date", "Unit Price", "Quantity", "Total"] -> return false, "Date" duplicate more than 1
-        [ "Date", "Unit Price", "Quantity", "Total"] -> return false, for missing "Product"
+        [ "Date", "Product", "Unit Price", "Quantity", "Total"] -> return true, no duplicate && no missing any members\n
+        [ "Date", "Product","Date", "Unit Price", "Quantity", "Total"] -> return false, "Date" duplicate more than 1 \n
+        [ "Date", "Unit Price", "Quantity", "Total"] -> return false, for missing "Product"\n
         """
 
         for header in self.output_headers:
