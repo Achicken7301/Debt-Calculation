@@ -1,8 +1,10 @@
-# Debt Calculation (new version update)
+# Debt Calculation (Update 08/2024)
 
 ![](docs/GUI.png)
 
 ![](docs/pdf_output.png)
+
+![](docs/docx_format.png)
 
 # Installation
 
