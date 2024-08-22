@@ -18,7 +18,9 @@ class MyDocx:
 
         self.m_lang = MultiLanguages()
 
+        # Document layout
         self.my_docx = Document()
+        # Title
         self.title = self.my_docx.add_heading(self.m_lang.trans("Book calc title"), 0)
         self.closing_date = self.my_docx.add_paragraph(
             self.m_lang.trans("Closing date")

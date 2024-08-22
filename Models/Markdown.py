@@ -1,4 +1,3 @@
-from ast import Mult
 import configparser
 import markdown
 from pandas import DataFrame
