@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>663</width>
+    <width>543</width>
     <height>528</height>
    </rect>
   </property>
@@ -175,8 +175,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>663</width>
-     <height>20</height>
+     <width>543</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Files">
@@ -203,8 +203,15 @@
      <string>About</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionStore_Infos"/>
+   </widget>
    <addaction name="menu_Files"/>
    <addaction name="menuViews"/>
+   <addaction name="menuOptions"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -221,6 +228,11 @@
   <action name="actionVietnamese">
    <property name="text">
     <string>Vietnamese</string>
+   </property>
+  </action>
+  <action name="actionStore_Infos">
+   <property name="text">
+    <string>Store Infos</string>
    </property>
   </action>
  </widget>

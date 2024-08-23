@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/khang/Documents/Projects/2024/Debt-Calculation/ui/main_ui.ui'
+# Form implementation generated from reading ui file 'd:\Users\Khang\Documents\GitHub\Debt-Calculation\ui\main_ui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(663, 528)
+        MainWindow.resize(543, 528)
         MainWindow.setAcceptDrops(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAcceptDrops(False)
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.tableWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 663, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 543, 21))
         self.menubar.setObjectName("menubar")
         self.menu_Files = QtWidgets.QMenu(self.menubar)
         self.menu_Files.setObjectName("menu_Files")
@@ -95,6 +95,8 @@ class Ui_MainWindow(object):
         self.menuLanguage.setObjectName("menuLanguage")
         self.menuAbout = QtWidgets.QMenu(self.menubar)
         self.menuAbout.setObjectName("menuAbout")
+        self.menuOptions = QtWidgets.QMenu(self.menubar)
+        self.menuOptions.setObjectName("menuOptions")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -105,12 +107,16 @@ class Ui_MainWindow(object):
         self.actionEnglish.setObjectName("actionEnglish")
         self.actionVietnamese = QtWidgets.QAction(MainWindow)
         self.actionVietnamese.setObjectName("actionVietnamese")
+        self.actionStore_Infos = QtWidgets.QAction(MainWindow)
+        self.actionStore_Infos.setObjectName("actionStore_Infos")
         self.menu_Files.addAction(self.actionOpen)
         self.menuLanguage.addAction(self.actionEnglish)
         self.menuLanguage.addAction(self.actionVietnamese)
         self.menuViews.addAction(self.menuLanguage.menuAction())
+        self.menuOptions.addAction(self.actionStore_Infos)
         self.menubar.addAction(self.menu_Files.menuAction())
         self.menubar.addAction(self.menuViews.menuAction())
+        self.menubar.addAction(self.menuOptions.menuAction())
         self.menubar.addAction(self.menuAbout.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -132,6 +138,8 @@ class Ui_MainWindow(object):
         self.menuViews.setTitle(_translate("MainWindow", "Views"))
         self.menuLanguage.setTitle(_translate("MainWindow", "Language"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))
+        self.menuOptions.setTitle(_translate("MainWindow", "Options"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         self.actionEnglish.setText(_translate("MainWindow", "English"))
         self.actionVietnamese.setText(_translate("MainWindow", "Vietnamese"))
+        self.actionStore_Infos.setText(_translate("MainWindow", "Store Infos"))

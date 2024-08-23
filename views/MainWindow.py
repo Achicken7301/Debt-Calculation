@@ -1,15 +1,30 @@
 import PyQt5
 import PyQt5.QtCore
 from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QMainWindow, QComboBox
+from PyQt5.QtWidgets import (
+    QMessageBox,
+    QTableWidgetItem,
+    QMainWindow,
+    QComboBox,
+    QDialogButtonBox,
+)
 from PyQt5.QtCore import Qt
+
+# Models
 from Models.Docx import MyDocx
 from Models.Global import MY_EXPORT_FORMAT, ErrorHandler, ExportFormat, FileFormat
 from Models.Markdown import MyMarkdown, Style
 from Models.MultiLangues import MultiLanguages
+
+# Main ui
 from ui.main_ui_ui import Ui_MainWindow
+
+# Depencences???
 from datetime import datetime, date
 import pandas as pd
+
+# View
+from views.EditStoreInfos import EditStoreInfos
 
 
 class MainWindow(QMainWindow):
@@ -38,6 +53,7 @@ class MainWindow(QMainWindow):
         ]
         self.is_load_file = 0
         self.main_ui.file_generate.clicked.connect(self.file_generate_btn)
+        self.main_ui.actionStore_Infos.triggered.connect(self.edit_store_info)
 
         self.main_ui.closing_date.setDate(PyQt5.QtCore.QDate(date.today()))
 
@@ -46,6 +62,10 @@ class MainWindow(QMainWindow):
         #     self.md = MyMarkdown()
         # elif MY_EXPORT_FORMAT == ExportFormat.DOCX:
         #     self.docx = MyDocx()
+
+    def edit_store_info(self):
+        edit_store_infos_ui = EditStoreInfos()
+        edit_store_infos_ui.exec()
 
     def file_generate_btn(self):
         """Function callback when button is clicked"""
