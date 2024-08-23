@@ -3,8 +3,7 @@
 /env/
 /md/
 /Python310/
-
 .conf
-*.exe
 *.pyc
 test.*
+/build
