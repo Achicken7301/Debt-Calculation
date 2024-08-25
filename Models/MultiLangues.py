@@ -7,7 +7,8 @@ import requests
 
 class MultiLanguages:
     def __init__(self) -> None:
-        self.language = ProgramConfig().read("DEFAULT", "language")
+        # Hard coded - Ill fix this
+        self.language = ProgramConfig().read("GENERAL", "language")
         # If no translate folder -> create one
         trans_folder = "translate"
         if not os.path.exists(trans_folder):
