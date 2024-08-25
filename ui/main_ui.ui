@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>543</width>
-    <height>528</height>
+    <width>668</width>
+    <height>436</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -175,7 +175,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>543</width>
+     <width>668</width>
      <height>21</height>
     </rect>
    </property>
@@ -232,7 +232,12 @@
   </action>
   <action name="actionStore_Infos">
    <property name="text">
-    <string>Store Infos</string>
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

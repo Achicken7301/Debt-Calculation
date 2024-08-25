@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(543, 528)
+        MainWindow.resize(668, 436)
         MainWindow.setAcceptDrops(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAcceptDrops(False)
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.tableWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 543, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 668, 21))
         self.menubar.setObjectName("menubar")
         self.menu_Files = QtWidgets.QMenu(self.menubar)
         self.menu_Files.setObjectName("menu_Files")
@@ -109,6 +109,8 @@ class Ui_MainWindow(object):
         self.actionVietnamese.setObjectName("actionVietnamese")
         self.actionStore_Infos = QtWidgets.QAction(MainWindow)
         self.actionStore_Infos.setObjectName("actionStore_Infos")
+        self.actionSettings = QtWidgets.QAction(MainWindow)
+        self.actionSettings.setObjectName("actionSettings")
         self.menu_Files.addAction(self.actionOpen)
         self.menuLanguage.addAction(self.actionEnglish)
         self.menuLanguage.addAction(self.actionVietnamese)
@@ -142,4 +144,5 @@ class Ui_MainWindow(object):
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         self.actionEnglish.setText(_translate("MainWindow", "English"))
         self.actionVietnamese.setText(_translate("MainWindow", "Vietnamese"))
-        self.actionStore_Infos.setText(_translate("MainWindow", "Store Infos"))
+        self.actionStore_Infos.setText(_translate("MainWindow", "Settings"))
+        self.actionSettings.setText(_translate("MainWindow", "Settings"))
