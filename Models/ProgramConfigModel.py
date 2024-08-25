@@ -2,6 +2,8 @@ import configparser
 import os
 import shutil
 
+from Models.Global import ExportFormat, Option, Section
+
 
 class ProgramConfig:
     def __init__(self) -> None:
@@ -13,6 +15,12 @@ class ProgramConfig:
         self.config.read(
             ".conf", encoding="utf-8"
         )  # Replace 'settings.conf' with your file name
+
+        # Will optimize this later
+        self.section = dict()
+        self.option = dict()
+        self.section[Section.GENERAL] = Section.GENERAL.value
+        self.option[Option.export_format] = Option.export_format.value
 
     def get_all_opt_in(self, sec_target: str) -> list:
         """Return as a list of all opt in section
@@ -49,7 +57,16 @@ class ProgramConfig:
         """
         self.config[section][opt] = opt_data
 
-    def read(self, section: str, opt: str) -> str:
+    def read(self, section: str, opt: str):
+        if section == Section.GENERAL and opt == Option.export_format:
+            value_export_format = self.config[self.section[Section.GENERAL]][
+                self.option[Option.export_format]
+            ]
+            if value_export_format == ExportFormat.DOCX.value:
+                return ExportFormat.DOCX
+            else:
+                return ExportFormat.PDF
+
         return str(self.config[section][opt])
 
     def save(self):

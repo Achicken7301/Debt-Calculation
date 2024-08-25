@@ -1,6 +1,6 @@
 import json
 from Models.Global import ErrorHandler
-from Models.ProgramConfig import ProgramConfig
+from Models.ProgramConfigModel import ProgramConfig
 import os
 import requests
 

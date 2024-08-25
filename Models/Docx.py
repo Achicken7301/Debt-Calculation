@@ -1,9 +1,7 @@
-from contextlib import closing
-import os
 from docx import Document
 from pandas import DataFrame
 
-from Models.Global import MY_EXPORT_FORMAT, ExportFormat
+from Models.Global import *
 from Models.MultiLangues import MultiLanguages
 
 
@@ -11,10 +9,6 @@ class MyDocx:
     def __init__(
         self, _cus_name="Unknown", _cus_number="001", _closing_date="01/01/2001"
     ) -> None:
-        if MY_EXPORT_FORMAT == ExportFormat.PDF:
-            # Write log or print
-            print("Export format is not docx")
-            return
 
         self.m_lang = MultiLanguages()
 

@@ -68,7 +68,7 @@ class MyMarkdown:
         {self.store_district}<br>
         {self.store_city}<br>
         {self.store_phone_number}<br> </td> </tr> </tbody> </table> <hr> </div> <div class="dataframe"> <h2 style="text-align: center;">
-        {self.m_lang.trans("Customer debt")} </h2> </div>
+        {self.m_lang.trans("Book calc title")} </h2> </div>
         <p style="text-align: right;">{self.m_lang.trans("Closing date")}: {_closing_date}.</p><br>
         """
 
@@ -126,7 +126,9 @@ class MyMarkdown:
 
     def get_store_name(self):
         config = configparser.ConfigParser()
-        config.read(".conf")  # Replace 'settings.conf' with your file name
+        config.read(
+            ".conf", encoding="utf-8"
+        )  # Replace 'settings.conf' with your file name
         self.store_name = config["STORE"]["name"]
         self.store_addr = config["STORE"]["addr"]
         self.store_street = config["STORE"]["street"]
