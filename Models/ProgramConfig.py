@@ -10,7 +10,24 @@ class ProgramConfig:
         if self.ensure_conf_file():
             print("Create .conf file")
 
-        self.config.read(".conf")  # Replace 'settings.conf' with your file name
+        self.config.read(
+            ".conf", encoding="utf-8"
+        )  # Replace 'settings.conf' with your file name
+
+    def get_all_opt_in(self, sec_target: str) -> list:
+        """Return as a list of all opt in section
+
+        Args:
+            section (str): section in file
+
+        Returns:
+            list: list of all opts
+        """
+        temp_opt = list()
+        for opt in self.config.options(section=sec_target):
+            temp_opt.append(opt)
+
+        return temp_opt
 
     def ensure_conf_file(
         self, conf_file=".conf", example_conf_file="example.conf"
@@ -22,12 +39,19 @@ class ProgramConfig:
             return False
 
     def create_update(self, section: str, opt: str, opt_data: str):
+        """Create AND Update
+        But remember to self.config.save() to store data to file
+
+        Args:
+            section (str): CAPS
+            opt (str): options
+            opt_data (str): updated data
+        """
         self.config[section][opt] = opt_data
 
     def read(self, section: str, opt: str) -> str:
-        print(f"[{section}][{opt}]")
-        return self.config[section][opt]
+        return str(self.config[section][opt])
 
     def save(self):
-        with open(".conf", "w") as configfile:
+        with open(".conf", "w", encoding="utf-8") as configfile:
             self.config.write(configfile)
