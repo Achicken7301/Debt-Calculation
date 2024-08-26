@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         self.main_ui = Ui_MainWindow()
         self.main_ui.setupUi(self)
         self.m_lang = MultiLanguages()
+        self.conf = ProgramConfig()
         self.col_format = {f"{self.m_lang.trans('Unit price')}": "{:,}"}
 
         # Base on default language content here will change
@@ -112,22 +113,16 @@ class MainWindow(QMainWindow):
         # Initiate temp for export pdf or docx format
         # This is crucial cuz the whole system i use "add to temp" NOT overwrite them.
         # So... this temp variables need to be init right here.
-        if (
-            ProgramConfig().read(Section.GENERAL, Option.export_format)
-            == ExportFormat.PDF
-        ):
+        if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.PDF:
             self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
-        elif (
-            ProgramConfig().read(Section.GENERAL, Option.export_format)
-            == ExportFormat.DOCX
-        ):
+        elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
             self.docx = MyDocx()
         else:
             self.docx = MyDocx()
 
         for date in unique_dates:
+            # Format `date` into %d/%m/%Y
             # Find month different
-            # _close_date = self.main_ui.closing_date.date().toString("dd/MM/yyyy")
             m_diff = self.month_difference(date, closing_date)
 
             # Find total per invoice (day)
@@ -151,7 +146,7 @@ class MainWindow(QMainWindow):
             total_interest += total_interest_per_invoice
 
             if (
-                ProgramConfig().read(Section.GENERAL, Option.export_format)
+                self.conf.read(Section.GENERAL, Option.export_format)
                 == ExportFormat.PDF
             ):
                 # Add to pdf
@@ -184,7 +179,7 @@ class MainWindow(QMainWindow):
                 )
 
             if (
-                ProgramConfig().read(Section.GENERAL, Option.export_format)
+                self.conf.read(Section.GENERAL, Option.export_format)
                 == ExportFormat.DOCX
             ):
                 df_sort_by_date = self.cols_format(df_sort_by_date)
@@ -204,10 +199,7 @@ class MainWindow(QMainWindow):
                 )
                 pass
 
-        if (
-            ProgramConfig().read(Section.GENERAL, Option.export_format)
-            == ExportFormat.PDF
-        ):
+        if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.PDF:
             self.md.summary_append(["", "<hr>", "", "<hr>", ""])
             self.md.summary_append(
                 [
@@ -219,10 +211,7 @@ class MainWindow(QMainWindow):
                 ]
             )
             self.md.generate_file_pdf_format(f"{cus_name}_{cus_book_number}")
-        elif (
-            ProgramConfig().read(Section.GENERAL, Option.export_format)
-            == ExportFormat.DOCX
-        ):
+        elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
             self.docx.addTableSummary(
                 "",
                 f"{total:,}",
@@ -237,7 +226,7 @@ class MainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "Success",
-            f"Output {'DOCX' if ProgramConfig().read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX else 'PDF'} file successfully!!!",
+            f"Output {'DOCX' if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX else 'PDF'} file successfully!!!",
             buttons=QMessageBox.Ok,
             defaultButton=QMessageBox.Ok,
         )

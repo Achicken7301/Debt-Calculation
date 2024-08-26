@@ -5,7 +5,15 @@ import shutil
 from Models.Global import ExportFormat, Option, Section
 
 
-class ProgramConfig:
+class SingletonClass(object):
+    def __new__(cls):
+        if not hasattr(cls, "instance"):
+            cls.instance = super(SingletonClass, cls).__new__(cls)
+        return cls.instance
+
+
+class ProgramConfig(SingletonClass):
+
     def __init__(self) -> None:
         self.config = configparser.ConfigParser()
         # Check there is .conf file, if not, copy from example from example.conf file to .conf
