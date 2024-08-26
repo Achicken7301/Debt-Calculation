@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
         self.main_ui.setupUi(self)
         self.m_lang = MultiLanguages()
         self.conf = ProgramConfig()
+        self.file_format = FileFormat.NONE
         self.col_format = {f"{self.m_lang.trans('Unit price')}": "{:,}"}
 
         # Base on default language content here will change
@@ -103,16 +104,30 @@ class MainWindow(QMainWindow):
 
             return
 
+        if self.file_format == FileFormat.XLSX:
+            try:
+                self.file_data[self.m_lang.trans("Date")] = self.file_data[
+                    self.m_lang.trans("Date")
+                ].dt.strftime(r"%d/%m/%Y")
+            except:
+                """
+                TODO The point is, when i use this 2nd time, 
+                the self.file_data is already formated, so cause conflict, 
+                i'll more condition on this later
+                """
+                print("I WILL FIX THIS IN THE FUTURE")
+
         # Find diff in months -> total -> interest -> add to pdf -> save as .pdf file
         # List all unique dates in columns
         unique_dates = self.file_data[self.m_lang.trans("Date")].unique()
         total = 0
         total_interest = 0
 
-        # self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
-        # Initiate temp for export pdf or docx format
-        # This is crucial cuz the whole system i use "add to temp" NOT overwrite them.
-        # So... this temp variables need to be init right here.
+        """Why do i init md and docx here, but not in the contructor??
+        Initiate temp for export pdf or docx format
+        This is crucial cuz the whole system i use "add to temp" NOT overwrite them.
+        So... this temp variables need to be init right here.
+        """
         if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.PDF:
             self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
         elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
@@ -121,10 +136,8 @@ class MainWindow(QMainWindow):
             self.docx = MyDocx()
 
         for date in unique_dates:
-            # Format `date` into %d/%m/%Y
-            # Find month different
-            m_diff = self.month_difference(date, closing_date)
 
+            m_diff = self.month_difference(date, closing_date)
             # Find total per invoice (day)
             df_sort_by_date = self.file_data[
                 self.file_data[self.m_lang.trans("Date")] == date
@@ -132,15 +145,15 @@ class MainWindow(QMainWindow):
             total_per_invoice = df_sort_by_date[
                 self.m_lang.trans("Total (Unit price * Quantity)")
             ].sum()
-            # print(self.file_data[self.file_data[self.m_lang.trans("Date")] == date])
+
+            # Add style for dataframe
+            df_sort_by_date = self.cols_format(df_sort_by_date)
 
             # Find interest
             interest_rate = float(self.main_ui.interest_rate.text()) / 100.0
             total_interest_per_invoice = self.calc_interest(
                 total_per_invoice, interest_rate, m_diff
             )
-
-            # print(f"Total interest: {total_interest}")
 
             total += total_per_invoice
             total_interest += total_interest_per_invoice
@@ -152,9 +165,6 @@ class MainWindow(QMainWindow):
                 # Add to pdf
                 self.md.append("<br>")
                 self.md.append(f"{date}", Style.BOLD)
-
-                # Add style for dataframe
-                df_sort_by_date = self.cols_format(df_sort_by_date)
 
                 # Add total/interest
                 _temp_table = ""
@@ -182,7 +192,6 @@ class MainWindow(QMainWindow):
                 self.conf.read(Section.GENERAL, Option.export_format)
                 == ExportFormat.DOCX
             ):
-                df_sort_by_date = self.cols_format(df_sort_by_date)
                 self.docx.addTableDetail(
                     date,
                     f"{total_per_invoice:,}",
@@ -257,17 +266,8 @@ class MainWindow(QMainWindow):
             return float(total * interest * _m_diff)
 
     def month_difference(self, date1: str, date2: str) -> int:
-        # Check if date is %d/%m/%Y format
-        try:
-            # Convert the date strings to datetime objects
-            date1_obj = datetime.strptime(date1, r"%d/%m/%Y")
-        except:
-            # If not try different formats
-            print(r"Format date is not %d/%m/%Y, try another format")
-            date1_obj = datetime.strptime(str(date1), r"%Y-%m-%d %H:%M:%S")
-
+        date1_obj = datetime.strptime(date1, r"%d/%m/%Y")
         date2_obj = datetime.strptime(date2, r"%d/%m/%Y")
-        # Calculate the difference in months
         diff_months = (
             (date2_obj.year - date1_obj.year) * 12 + date2_obj.month - date1_obj.month
         )
@@ -331,13 +331,13 @@ class MainWindow(QMainWindow):
             for url in urls:
                 if url.isLocalFile():
                     file_abs_path = str(url.toLocalFile())
-                    file_format = self.check_file_format(file_abs_path)
+                    self.file_format = self.check_file_format(file_abs_path)
 
                     # File format handler error
                     temp_text = self.m_lang.trans(
                         "This file is NOT .xlsx or .csv format\r\nPlease try again"
                     )
-                    if file_format == FileFormat.NONE:
+                    if self.file_format == FileFormat.NONE:
                         # Create dialog warning
                         QMessageBox.warning(
                             self,
@@ -350,7 +350,7 @@ class MainWindow(QMainWindow):
                         return
 
                     # Load file to table
-                    self.load_file_to_table(file_abs_path, file_format)
+                    self.load_file_to_table(file_abs_path, self.file_format)
                 else:
                     print("This is something else file")
                     print(str(url.toString()))
