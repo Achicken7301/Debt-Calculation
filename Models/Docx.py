@@ -50,11 +50,11 @@ class MyDocx:
         self, date, tt_per_i, m_diff, tt_interest_p_i, tt_cus_have_to_pay
     ):
         new_r = self.summary_table.add_row().cells
-        new_r[0].text = date
-        new_r[1].text = tt_per_i
-        new_r[2].text = m_diff
-        new_r[3].text = tt_interest_p_i
-        new_r[4].text = tt_cus_have_to_pay
+        new_r[0].text = str(date)
+        new_r[1].text = str(tt_per_i)
+        new_r[2].text = str(m_diff)
+        new_r[3].text = str(tt_interest_p_i)
+        new_r[4].text = str(tt_cus_have_to_pay)
 
     def generate_file_docx_format(self, file_name, closing_date):
         self.title.add_run(text=f" {file_name}")
