@@ -2,7 +2,7 @@ from urllib import response
 from PyQt5 import QtGui, QtCore, QtWidgets
 import requests
 import sys
-from views.MainWindow import MainWindow
+from views.MainWindowView import MainWindow
 import tabulate
 import openpyxl
 import os
