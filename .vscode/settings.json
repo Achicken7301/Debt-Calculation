@@ -1,3 +1,4 @@
 {
-    "python.analysis.autoImportCompletions": true
+    "python.analysis.autoImportCompletions": true,
+    "vim.vimrc.path": "/home/khang/.config/nvim/.vimrc"
 }
