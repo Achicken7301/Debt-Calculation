@@ -8,10 +8,8 @@
 
 # Installation
 ## Build from source
-Setup Python enviroment: 
-``` bash
-python -env python -m venv env
-```
+Python version: 3.10.16
+
 Install from requirements:
 `pip install -r requirements.txt`
 
@@ -19,6 +17,9 @@ Import requirements:
 `pip freeze > requirements.txt`
 
 ## WINDOWS
+``` bash
+python -m venv env
+```
 
 ## MACOS
 
