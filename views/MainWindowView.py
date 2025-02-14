@@ -229,7 +229,7 @@ class MainWindow(QMainWindow):
                 f"= {(total + total_interest):,}",
             )
             self.docx.generate_file_docx_format(
-                f"{cus_name}_{cus_book_number}", closing_date
+                f"{cus_name}_{cus_book_number}", closing_date, self.main_ui.interest_rate.text()
             )
 
         QMessageBox.information(

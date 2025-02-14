@@ -18,10 +18,24 @@ class MyDocx:
         self.my_docx = Document()
         # Title
         self.title = self.my_docx.add_heading(self.m_lang.trans("Book calc title"), 0)
+
         self.closing_date = self.my_docx.add_paragraph(
             self.m_lang.trans("Closing date")
         )
+        self.interest_rate_paragraph = self.my_docx.add_paragraph(self.m_lang.trans("Interest rate per month"))
+        # Summary table
         self.summary_table = self.my_docx.add_table(rows=1, cols=5)
+        cell = self.summary_table.rows[0].cells
+        # This is hard code, I'll fix this later
+        cell[1].text = "(1)"
+        cell[2].text = "(2)"
+        cell[3].text = "(3)"
+        cell[4].text = "(4)"
+
+        # Add explain paragraph
+        self.explain_summary_table_paragraph = self.my_docx.add_paragraph(self.m_lang.trans("Explain Summary Table Paragraph"))
+
+        self.my_docx.add_page_break()
         self.my_docx.add_heading(self.m_lang.trans("Invoice detail"), level=1)
 
     def addParagraph(self, text: str):
@@ -74,9 +88,10 @@ class MyDocx:
             row.cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
             row.cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
-    def generate_file_docx_format(self, file_name, closing_date):
+    def generate_file_docx_format(self, file_name, closing_date, interest_rate):
         self.title.add_run(text=f" {file_name}")
-        self.closing_date.add_run(text=f" {closing_date}")
+        self.closing_date.add_run(text=f" {closing_date}.")
+        self.interest_rate_paragraph.add_run(text=f" {interest_rate}%.")
 
         # Save subfolder Granularity Monthly
         # Base on closing date
