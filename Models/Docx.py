@@ -1,4 +1,6 @@
+import os
 from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from pandas import DataFrame
 
 from Models.Global import *
@@ -32,6 +34,7 @@ class MyDocx:
         hdr_cell[0].text = str(date)
         hdr_cell[0].paragraphs[0].runs[0].font.bold = True
 
+
         # p - product, u_p - unit_price, q - quantity, tt - total
         for p, u_p, q, tt in datas:
             new_r = invoice_detail_table.add_row().cells
@@ -40,11 +43,19 @@ class MyDocx:
             new_r[2].text = str(q)
             new_r[3].text = str(tt)
 
+
         # Add summary row
         new_r = invoice_detail_table.add_row().cells
-        new_r[3].text = 20 * "_"
+        new_r[3].text = (len(tt_p_i) + 2) * "_"
+        # new_r[3].text = 20 * "_"
         new_r = invoice_detail_table.add_row().cells
         new_r[3].text = str(tt_p_i)
+
+        # Align specific columns for all rows
+        for row in invoice_detail_table.rows:
+            row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row.cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     def addTableSummary(
         self, date, tt_per_i, m_diff, tt_interest_p_i, tt_cus_have_to_pay
@@ -56,7 +67,28 @@ class MyDocx:
         new_r[3].text = str(tt_interest_p_i)
         new_r[4].text = str(tt_cus_have_to_pay)
 
+        # Align specific columns for all rows
+        for row in self.summary_table.rows:
+            row.cells[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row.cells[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row.cells[3].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            row.cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
+
     def generate_file_docx_format(self, file_name, closing_date):
         self.title.add_run(text=f" {file_name}")
         self.closing_date.add_run(text=f" {closing_date}")
-        self.my_docx.save(f"{file_name}.docx")
+
+        # Save subfolder Granularity Monthly
+        # Base on closing date
+        _, m_dir, y_dir = closing_date.split('/')
+        # Check if had  have current-year directory, if not create
+        # Check if the folder exists
+        if not os.path.exists(y_dir):
+            # Create the folder if it doesn't exist
+            os.makedirs(y_dir)
+        # Check if had  have current-month directory, if not create
+        if not os.path.exists(f"{y_dir}//{m_dir}"):
+            # Create the folder if it doesn't exist
+            os.makedirs(f"{y_dir}//{m_dir}")
+
+        self.my_docx.save(f"{y_dir}//{m_dir}/{file_name}.docx")
