@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'd:\Users\Khang\Documents\GitHub\Debt-Calculation\ui\main_ui.ui'
+# Form implementation generated from reading ui file '/home/khang/Documents/Github/Debt-Calculation/ui/main_ui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -28,6 +28,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.label_5)
         self.cus_name = QtWidgets.QLineEdit(self.centralwidget)
         self.cus_name.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.cus_name.setClearButtonEnabled(True)
         self.cus_name.setObjectName("cus_name")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.cus_name)
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -35,6 +36,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.label_6)
         self.cus_number = QtWidgets.QLineEdit(self.centralwidget)
         self.cus_number.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.cus_number.setClearButtonEnabled(True)
         self.cus_number.setObjectName("cus_number")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.cus_number)
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
@@ -85,7 +87,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.tableWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 668, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 668, 22))
         self.menubar.setObjectName("menubar")
         self.menu_Files = QtWidgets.QMenu(self.menubar)
         self.menu_Files.setObjectName("menu_Files")
@@ -132,6 +134,7 @@ class Ui_MainWindow(object):
         self.label_6.setText(_translate("MainWindow", "Customer Number in the book"))
         self.cus_number.setText(_translate("MainWindow", "133"))
         self.label_2.setText(_translate("MainWindow", "Closing Date"))
+        self.closing_date.setDisplayFormat(_translate("MainWindow", "dd/MM/yyyy"))
         self.label_3.setText(_translate("MainWindow", "Interest Rate (%)"))
         self.interest_rate.setText(_translate("MainWindow", "3"))
         self.file_generate.setText(_translate("MainWindow", "Generate"))
