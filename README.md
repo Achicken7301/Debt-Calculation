@@ -24,3 +24,17 @@ python -m venv env
 ## MACOS
 
 ## LINUX
+
+Create env with pyenv
+
+First, install the desire version of your python as given below
+
+`pyenv install <version>`
+
+Next, set the global version as given below:
+
+`pyenv global <version>`
+
+Finally, create the virtual environment as given below:
+
+`pyenv exec python -m venv venv`
