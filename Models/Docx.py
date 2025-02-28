@@ -1,11 +1,19 @@
 import os
+from pydoc import doc
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Inches, Mm
 from pandas import DataFrame
 
 from Models.Global import *
 from Models.MultiLangues import MultiLanguages
 
+
+# A4 dimensions in inches (Width x Height)
+A4_WIDTH = Mm(210)  # 210mm
+A4_HEIGHT = Mm(297)  # 297mm
+# Margin size in mm
+MARGIN_SIZE = Mm(20)  # 20mm (2cm)
 
 class MyDocx:
     def __init__(
@@ -16,13 +24,39 @@ class MyDocx:
 
         # Document layout
         self.my_docx = Document()
-        # Title
-        self.title = self.my_docx.add_heading(self.m_lang.trans("Book calc title"), 0)
 
-        self.closing_date = self.my_docx.add_paragraph(
-            self.m_lang.trans("Closing date")
-        )
-        self.interest_rate_paragraph = self.my_docx.add_paragraph(self.m_lang.trans("Interest rate per month"))
+        # Set to A4
+        # Set page size to A4
+        section = self.my_docx.sections[0]
+        section.page_width = (A4_WIDTH)
+        section.page_height = (A4_HEIGHT)
+
+        # Set margins to 20mm (2cm) on all sides
+        section.left_margin = MARGIN_SIZE
+        section.right_margin = MARGIN_SIZE
+        section.top_margin = MARGIN_SIZE
+        section.bottom_margin = MARGIN_SIZE
+
+        # add style
+        self.my_docx.styles['Normal'].paragraph_format.space_before = 0
+        self.my_docx.styles['Normal'].paragraph_format.space_after = 0
+        self.my_docx.styles['Normal'].paragraph_format.line_spacing = 1
+
+        # Title
+        self.title = self.my_docx.add_heading(level=0)
+        run = self.title.add_run(self.m_lang.trans("Book calc title"))
+        run.bold = True
+
+        # Paragraph and style
+        self.closing_date = self.my_docx.add_paragraph()
+        run = self.closing_date.add_run(self.m_lang.trans("Closing date"))
+        run.italic = True
+        self.interest_rate_paragraph = self.my_docx.add_paragraph()
+        run = self.interest_rate_paragraph.add_run(self.m_lang.trans("Interest rate per month"))
+        run.italic = True
+
+
+
         # Summary table
         self.summary_table = self.my_docx.add_table(rows=1, cols=5)
         cell = self.summary_table.rows[0].cells
@@ -33,7 +67,9 @@ class MyDocx:
         cell[4].text = "(4)"
 
         # Add explain paragraph
-        self.explain_summary_table_paragraph = self.my_docx.add_paragraph(self.m_lang.trans("Explain Summary Table Paragraph"))
+        self.explain_summary_table_paragraph = self.my_docx.add_paragraph()
+        run = self.explain_summary_table_paragraph.add_run(self.m_lang.trans("Explain Summary Table Paragraph"))
+        run.italic = True
 
         self.my_docx.add_page_break()
         self.my_docx.add_heading(self.m_lang.trans("Invoice detail"), level=1)
@@ -89,9 +125,16 @@ class MyDocx:
             row.cells[4].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
     def generate_file_docx_format(self, file_name, closing_date, interest_rate):
-        self.title.add_run(text=f" {file_name}")
-        self.closing_date.add_run(text=f" {closing_date}.")
-        self.interest_rate_paragraph.add_run(text=f" {interest_rate}%.")
+        run = self.title.add_run(text=f" {file_name}")
+        run.bold = True
+
+        run = self.closing_date.add_run(text=f" {closing_date}.")
+        run.bold = True
+        run.italic = True
+
+        run = self.interest_rate_paragraph.add_run(text=f" {interest_rate}%.")
+        run.bold = True
+        run.italic = True
 
         # Save subfolder Granularity Monthly
         # Base on closing date
