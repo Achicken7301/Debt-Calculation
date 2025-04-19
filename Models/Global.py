@@ -1,6 +1,5 @@
 from enum import Enum, auto
 
-# from Models.ProgramConfigModel import ProgramConfig
 
 
 class FileFormat(Enum):
@@ -17,6 +16,7 @@ class ErrorHandler(Enum):
 class ExportFormat(Enum):
     DOCX = "DOCX"
     PDF = "PDF"
+    EXCEL = "EXCEL"
 
 
 class Section(Enum):
@@ -36,7 +36,6 @@ class Option(Enum):
     phone = "phone"
     director = "director"
     co_founder = "co_founder"
-
 
 # conf = ProgramConfig()
 # # I dont know how to not hard code here

@@ -1,4 +1,3 @@
-from urllib import response
 from PyQt5 import QtGui, QtCore, QtWidgets
 import requests
 import sys
