@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'd:\Users\Khang\Documents\GitHub\Debt-Calculation\ui\settings.ui'
+# Form implementation generated from reading ui file '/home/khang/Documents/Github/Debt-Calculation/ui/settings.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -86,6 +86,7 @@ class Ui_SettingsDialog(object):
         self.export_format_comboBox.setObjectName("export_format_comboBox")
         self.export_format_comboBox.addItem("")
         self.export_format_comboBox.addItem("")
+        self.export_format_comboBox.addItem("")
         self.horizontalLayout.addWidget(self.export_format_comboBox)
         self.verticalLayout.addLayout(self.horizontalLayout)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -121,4 +122,5 @@ class Ui_SettingsDialog(object):
         self.label_9.setText(_translate("SettingsDialog", "## Options"))
         self.label_10.setText(_translate("SettingsDialog", "Export format"))
         self.export_format_comboBox.setItemText(0, _translate("SettingsDialog", "DOCX"))
-        self.export_format_comboBox.setItemText(1, _translate("SettingsDialog", "PDF"))
+        self.export_format_comboBox.setItemText(1, _translate("SettingsDialog", "EXCEL"))
+        self.export_format_comboBox.setItemText(2, _translate("SettingsDialog", "PDF"))

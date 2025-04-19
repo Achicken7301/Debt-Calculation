@@ -72,6 +72,8 @@ class ProgramConfig(SingletonClass):
             ]
             if value_export_format == ExportFormat.DOCX.value:
                 return ExportFormat.DOCX
+            elif value_export_format == ExportFormat.EXCEL.value:
+                return ExportFormat.EXCEL
             else:
                 return ExportFormat.PDF
 

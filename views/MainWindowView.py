@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 # Models
+from Controller import Controller
 from Models.Docx import MyDocx
 from Models.Global import ErrorHandler, ExportFormat, FileFormat, Option, Section
 from Models.Markdown import MyMarkdown, Style
@@ -64,7 +65,7 @@ class MainWindow(QMainWindow):
         edit_store_infos_ui.exec()
 
     def file_generate_btn(self):
-        """Function callback when button is clicked"""
+
         # Check file confition
         if self.is_load_file == 0:
             QMessageBox.warning(
@@ -104,6 +105,7 @@ class MainWindow(QMainWindow):
 
             return
 
+
         if self.file_format == FileFormat.XLSX:
             try:
                 self.file_data[self.m_lang.trans("Date")] = self.file_data[
@@ -120,6 +122,7 @@ class MainWindow(QMainWindow):
         # Find diff in months -> total -> interest -> add to pdf -> save as .pdf file
         # List all unique dates in columns
         unique_dates = self.file_data[self.m_lang.trans("Date")].unique()
+        interest_rate = float(self.main_ui.interest_rate.text()) / 100.0
         total = 0
         total_interest = 0
 
@@ -132,6 +135,8 @@ class MainWindow(QMainWindow):
             self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
         elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
             self.docx = MyDocx()
+        elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.EXCEL:
+            self.xlsx = Controller().generate_xlsx_format(self.file_data, closing_date, interest_rate)
         else:
             self.docx = MyDocx()
 
@@ -150,7 +155,6 @@ class MainWindow(QMainWindow):
             df_sort_by_date = self.cols_format(df_sort_by_date)
 
             # Find interest
-            interest_rate = float(self.main_ui.interest_rate.text()) / 100.0
             total_interest_per_invoice = self.calc_interest(
                 total_per_invoice, interest_rate, m_diff
             )
