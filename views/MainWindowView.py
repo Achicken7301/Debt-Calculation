@@ -137,6 +137,14 @@ class MainWindow(QMainWindow):
             self.docx = MyDocx()
         elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.EXCEL:
             self.xlsx = Controller().generate_xlsx_format(self.file_data, closing_date, interest_rate)
+            QMessageBox.information(
+                self,
+                "Success",
+                f"Output EXCEL file successfully!!!",
+                buttons=QMessageBox.Ok,
+                defaultButton=QMessageBox.Ok,
+            )
+            return
         else:
             self.docx = MyDocx()
 
