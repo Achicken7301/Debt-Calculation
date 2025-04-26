@@ -21,6 +21,8 @@ Import requirements:
 python -m venv env
 ```
 
+If you have any problem with weasyprint missing library or something, try to install [GTK-for-Windows-Runtime-Environment-Installer](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases)
+
 ## MACOS
 
 ## LINUX
