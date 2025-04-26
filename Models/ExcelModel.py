@@ -9,6 +9,13 @@ from Models.MultiLangues import MultiLanguages
 
 SUMMARY_ROWS_INDEX = 12
 DETAIL_ROWS_INDEX = 18
+FILE_OUTPUT_FORMAT = ".xlsx"
+REPORT_INDEX_XLSX_CELL = "B4"
+REPORT_INTEREST_RATE_CELL = "B5"
+REPORT_CUSTOMER_NAME_CELL = "B7"
+REPORT_CURRENT_DATE_CELL = "E4"
+REPORT_CLOSING_DATE_CELL = "E5"
+REPORT_CUSTOMER_BOOK_NUMBER_CELL = "E7"
 EXCEL_TEMPLATE_FILE = "template.xlsx"
 EXCEL_TEMPLATE_FILE_URL = "https://github.com/Achicken7301/Debt-Calculation/raw/refs/heads/develop/template.xlsx"
 
@@ -40,11 +47,23 @@ class ExcelModel:
             f"{self.m_lang.trans('Quantity')}",
             f"{self.m_lang.trans('Total (Unit price * Quantity)')}",
                                                   ])
+        
+    def file_init(self, d:dict):
+        self._duplicate(f"{d['closing_date'].replace('/', '-')} {d['cus_name']}{FILE_OUTPUT_FORMAT}")
+        wk = load_workbook(self.output_file)
+        sheet = wk.active
+        sheet[REPORT_CLOSING_DATE_CELL] = d["closing_date"]
+        sheet[REPORT_INTEREST_RATE_CELL] = f"{d['i'] * 100}%/{MultiLanguages().trans('Month')}"
+        sheet[REPORT_INDEX_XLSX_CELL] = f"{d['closing_date'].replace('/', '')}_{d['cus_book_No']}"
+        sheet[REPORT_CUSTOMER_BOOK_NUMBER_CELL] = d["cus_book_No"]
+        sheet[REPORT_CUSTOMER_NAME_CELL] = d["cus_name"]
 
-    def _duplicate(self, closing_date):
+        wk.save(self.output_file)
+
+    def _duplicate(self, f_name):
         """This will copy template into a new file with formated, then passing the data only
         """
-        self.output_file = f"{closing_date}_testing_new_file.xlsx"
+        self.output_file = f_name
         shutil.copyfile(self.excel_source_file, self.output_file)
     
     def _addSummaryTable(self, date, tt_per_i, m_diff, tt_interest_p_i, tt_cus_have_to_pay="-"):
@@ -112,7 +131,6 @@ class ExcelModel:
             closing_date (str): _description_
             i (float): interest rate
         """
-        self._duplicate(closing_date.replace("/", "-"))
         self.file_data = raw_data
         unique_dates = self.file_data[self.m_lang.trans("Date")].unique()
         total = 0

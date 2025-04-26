@@ -136,7 +136,16 @@ class MainWindow(QMainWindow):
         elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
             self.docx = MyDocx()
         elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.EXCEL:
-            self.xlsx = Controller().generate_xlsx_format(self.file_data, closing_date, interest_rate)
+            file_datas = dict()
+            file_datas["closing_date"] = closing_date
+            file_datas["cus_name"] = cus_name
+            file_datas["cus_book_No"] = cus_book_number 
+            file_datas["i"] = interest_rate
+            c = Controller()
+            c.import_cus_xlsx_date(file_datas)
+            c.generate_xlsx_format(self.file_data, closing_date, interest_rate)
+
+            # Need to check for error here
             QMessageBox.information(
                 self,
                 "Success",

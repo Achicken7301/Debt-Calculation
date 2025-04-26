@@ -1,6 +1,7 @@
 {
     "Date (DD/MM/YYYY format)": "Ngày (Định dạng DD/MM/YYYY)",
     "Date": "Ngày",
+    "Month": "Tháng",
     "Closing date": "Ngày chốt sổ: ",
     "Interest rate per month": "Lãi suất hàng tháng: ",
     "Explain Summary Table Paragraph": "Giải thích: \n(1) - tổng giá trị hóa đơn theo ngày.\n(2) - số tháng tính lãi suất.\n(3) = (1) * (2) * lãi suất hằng tháng.\n(4) = (1) + (3).",
