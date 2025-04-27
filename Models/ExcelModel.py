@@ -10,13 +10,14 @@ from Models.MultiLangues import MultiLanguages
 SUMMARY_ROWS_INDEX = 12
 DETAIL_ROWS_INDEX = 18
 FILE_OUTPUT_FORMAT = ".xlsx"
+# FILE_OUTPUT_FORMAT = ".xlsm"
 REPORT_INDEX_XLSX_CELL = "B4"
 REPORT_INTEREST_RATE_CELL = "B5"
 REPORT_CUSTOMER_NAME_CELL = "B7"
 REPORT_CURRENT_DATE_CELL = "E4"
 REPORT_CLOSING_DATE_CELL = "E5"
 REPORT_CUSTOMER_BOOK_NUMBER_CELL = "E7"
-EXCEL_TEMPLATE_FILE = "template.xlsx"
+EXCEL_TEMPLATE_FILE = "template"  + FILE_OUTPUT_FORMAT
 EXCEL_TEMPLATE_FILE_URL = "https://github.com/Achicken7301/Debt-Calculation/raw/refs/heads/develop/template.xlsx"
 
 class ExcelModel:
@@ -50,7 +51,7 @@ class ExcelModel:
         
     def file_init(self, d:dict):
         self._duplicate(f"{d['closing_date'].replace('/', '-')} {d['cus_name']}{FILE_OUTPUT_FORMAT}")
-        wk = load_workbook(self.output_file)
+        wk = load_workbook(self.output_file, keep_vba=True, read_only=False)
         sheet = wk.active
         sheet[REPORT_CLOSING_DATE_CELL] = d["closing_date"]
         sheet[REPORT_INTEREST_RATE_CELL] = f"{d['i'] * 100}%/{MultiLanguages().trans('Month')}"
@@ -94,7 +95,7 @@ class ExcelModel:
         return diff_months
     
     def _insert_formatted_rows(self, filepath, sheetname, start_row, num_rows):
-        wb = load_workbook(filepath)
+        wb = load_workbook(filepath,read_only=False,keep_vba=True)
         ws = wb[sheetname]
 
         # Step 1: Insert blank rows
