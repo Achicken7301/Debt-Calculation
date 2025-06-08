@@ -9,7 +9,7 @@ from PyQt5.QtCore import Qt, QDate
 
 # Models
 from Controller import Controller
-# from Models.Docx import MyDocx
+from Models.Docx import MyDocx
 # from Models.Markdown import MyMarkdown, Style
 from Models.Global import ErrorHandler, ExportFormat, FileFormat, Option, Section
 from Models.MultiLangues import MultiLanguages
@@ -129,9 +129,7 @@ class MainWindow(QMainWindow):
         This is crucial cuz the whole system i use "add to temp" NOT overwrite them.
         So... this temp variables need to be init right here.
         """
-        if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.PDF:
-            self.md = MyMarkdown(cus_name, cus_book_number, closing_date)
-        elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
+        if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
             self.docx = MyDocx()
         elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.EXCEL:
             file_datas = dict()
@@ -179,36 +177,6 @@ class MainWindow(QMainWindow):
 
             if (
                 self.conf.read(Section.GENERAL, Option.export_format)
-                == ExportFormat.PDF
-            ):
-                # Add to pdf
-                self.md.append("<br>")
-                self.md.append(f"{date}", Style.BOLD)
-
-                # Add total/interest
-                _temp_table = ""
-                _temp_table += (
-                    df_sort_by_date[self.output_headers].to_markdown(
-                        index=False, colalign=("left", "left", "right", "right")
-                    )
-                    + "\r\n"
-                )
-                _temp_table += f"||||<hr style='margin-right:0; width: 75%'>|\r\n"
-                _temp_table += f"||||{total_per_invoice:,}|\r\n"
-
-                self.md.append(_temp_table, Style.TABLE)
-                self.md.summary_append(
-                    [
-                        date,
-                        f"{total_per_invoice:,}",
-                        f"x{m_diff}",
-                        f"{total_interest_per_invoice:,}",
-                        "",
-                    ]
-                )
-
-            if (
-                self.conf.read(Section.GENERAL, Option.export_format)
                 == ExportFormat.DOCX
             ):
                 self.docx.addTableDetail(
@@ -227,19 +195,7 @@ class MainWindow(QMainWindow):
                 )
                 pass
 
-        if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.PDF:
-            self.md.summary_append(["", "<hr>", "", "<hr>", ""])
-            self.md.summary_append(
-                [
-                    "",
-                    "+",
-                    f"{total:,}",
-                    f"{total_interest:,}",
-                    f"= {(total + total_interest):,}",
-                ]
-            )
-            self.md.generate_file_pdf_format(f"{cus_name}_{cus_book_number}")
-        elif self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
+        if self.conf.read(Section.GENERAL, Option.export_format) == ExportFormat.DOCX:
             self.docx.addTableSummary(
                 "",
                 f"{total:,}",
