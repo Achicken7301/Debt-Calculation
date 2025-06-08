@@ -1,4 +1,4 @@
-# Debt Calculation (Update 08/2024)
+# Debt Calculation (Update 04/2025)
 
 ![](docs/GUI.png)
 ## PDF OUTPUT
