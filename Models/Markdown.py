@@ -1,7 +1,8 @@
-import configparser
-import markdown
+# import configparser 
+from configparser import ConfigParser
+from markdown import markdown
 from pandas import DataFrame
-from weasyprint import HTML, CSS
+from weasyprint import HTML
 from Models.MultiLangues import MultiLanguages
 
 
@@ -82,7 +83,7 @@ class MyMarkdown:
         # print(self.html_summary)
 
         # Convert HTML to PDF
-        summary = markdown.markdown(
+        summary = markdown(
             self.html_summary.to_markdown(
                 index=False,
                 colalign=("left", "right", "center", "right", "right"),
@@ -111,7 +112,7 @@ class MyMarkdown:
             self.html_content_body += data
             self.html_content_body += "</p>"
         elif style == Style.TABLE:
-            self.html_content_body += markdown.markdown(
+            self.html_content_body += markdown(
                 data, extensions=["markdown.extensions.tables"]
             )
         else:
@@ -125,7 +126,7 @@ class MyMarkdown:
         self.store_phone_number = phone_number
 
     def get_store_name(self):
-        config = configparser.ConfigParser()
+        config = ConfigParser()
         config.read(
             ".conf", encoding="utf-8"
         )  # Replace 'settings.conf' with your file name

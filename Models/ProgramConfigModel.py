@@ -1,7 +1,6 @@
-import configparser
-import os
-import shutil
-
+from configparser import ConfigParser
+import os.path
+from shutil import copyfile
 from Models.Global import ExportFormat, Option, Section
 
 
@@ -15,7 +14,7 @@ class SingletonClass(object):
 class ProgramConfig(SingletonClass):
 
     def __init__(self) -> None:
-        self.config = configparser.ConfigParser()
+        self.config =ConfigParser()
         # Check there is .conf file, if not, copy from example from example.conf file to .conf
         if self.ensure_conf_file():
             print("Create .conf file")
@@ -49,7 +48,7 @@ class ProgramConfig(SingletonClass):
         self, conf_file=".conf", example_conf_file="example.conf"
     ) -> bool:
         if not os.path.isfile(conf_file):
-            shutil.copyfile(example_conf_file, conf_file)
+            copyfile(example_conf_file, conf_file)
             return True
         else:
             return False

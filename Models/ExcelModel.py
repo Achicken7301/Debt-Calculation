@@ -1,10 +1,10 @@
 from copy import copy
 from openpyxl import load_workbook
-import pandas as pd
+from pandas import read_excel, DataFrame, concat, ExcelWriter
 from datetime import datetime
-import shutil
-import os
-import requests
+from shutil import copyfile
+import os.path
+from requests import get
 from Models.MultiLangues import MultiLanguages
 
 SUMMARY_ROWS_INDEX = 12
@@ -20,12 +20,13 @@ REPORT_CUSTOMER_BOOK_NUMBER_CELL = "E7"
 EXCEL_TEMPLATE_FILE = "template"  + FILE_OUTPUT_FORMAT
 EXCEL_TEMPLATE_FILE_URL = "https://github.com/Achicken7301/Debt-Calculation/raw/refs/heads/develop/template.xlsx"
 
+
 class ExcelModel:
     def __init__(self):
         self.excel_source_file = EXCEL_TEMPLATE_FILE
         # Check if there's no template file, start download one.
         if not os.path.isfile(EXCEL_TEMPLATE_FILE):
-            r = requests.get(EXCEL_TEMPLATE_FILE_URL)
+            r = get(EXCEL_TEMPLATE_FILE_URL)
             if r.status_code == 200:
                 with open(EXCEL_TEMPLATE_FILE, "wb") as file:
                     file.write(r.content)
@@ -33,16 +34,16 @@ class ExcelModel:
                 print(f"Cannot download {EXCEL_TEMPLATE_FILE}")
 
 
-        self.e_temp = pd.read_excel(self.excel_source_file)
+        self.e_temp = read_excel(self.excel_source_file)
         self.m_lang = MultiLanguages()
-        self.summary_table = pd.DataFrame(columns=[self.m_lang.trans("Date"), self.m_lang.trans("Total per invoice"), self.m_lang.trans("Date"), self.m_lang.trans("Date"), self.m_lang.trans("Date")])
+        self.summary_table = DataFrame(columns=[self.m_lang.trans("Date"), self.m_lang.trans("Total per invoice"), self.m_lang.trans("Date"), self.m_lang.trans("Date"), self.m_lang.trans("Date")])
         self.output_headers = [
             f"{self.m_lang.trans('Product')}",
             f"{self.m_lang.trans('Unit price')}",
             f"{self.m_lang.trans('Quantity')}",
             f"{self.m_lang.trans('Total (Unit price * Quantity)')}",
         ]
-        self.detail_table = pd.DataFrame(columns=[self.m_lang.trans("Date"), 
+        self.detail_table = DataFrame(columns=[self.m_lang.trans("Date"), 
             f"{self.m_lang.trans('Product')}",
             f"{self.m_lang.trans('Unit price')}",
             f"{self.m_lang.trans('Quantity')}",
@@ -65,17 +66,17 @@ class ExcelModel:
         """This will copy template into a new file with formated, then passing the data only
         """
         self.output_file = f_name
-        shutil.copyfile(self.excel_source_file, self.output_file)
+        copyfile(self.excel_source_file, self.output_file)
     
     def _addSummaryTable(self, date, tt_per_i, m_diff, tt_interest_p_i, tt_cus_have_to_pay="-"):
         new_row = [date, tt_per_i, m_diff, tt_interest_p_i, tt_cus_have_to_pay]
         self.summary_table.loc[len(self.summary_table)] = new_row
     
-    def _addTableDetail(self,date, total_per_invoice, df_datas:pd.DataFrame):
+    def _addTableDetail(self,date, total_per_invoice, df_datas:DataFrame):
         new_row = [date, "", "", "", ""]
         # new_row = [date, self.m_lang.trans('Product'), self.m_lang.trans('Quantity'), self.m_lang.trans('Unit price'), self.m_lang.trans('Total (Unit price * Quantity)')]
         self.detail_table.loc[len(self.detail_table) ]= new_row
-        self.detail_table = pd.concat([self.detail_table, df_datas], ignore_index=True)
+        self.detail_table = concat([self.detail_table, df_datas], ignore_index=True)
         new_row = ["", "", "", "Tổng cộng", total_per_invoice]
         self.detail_table.loc[len(self.detail_table) ]=new_row
 
@@ -124,7 +125,7 @@ class ExcelModel:
         # Save changes
         wb.save(filepath)
 
-    def export(self,raw_data:pd.DataFrame, closing_date:str, i:float):
+    def export(self,raw_data:DataFrame, closing_date:str, i:float):
         """This function will export to excel file
 
         Args:
@@ -162,15 +163,11 @@ class ExcelModel:
 
         # Add detail table
         self._insert_formatted_rows(self.output_file, "Sheet1", DETAIL_ROWS_INDEX, len(self.detail_table))
-        with pd.ExcelWriter(self.output_file, mode="a", if_sheet_exists="overlay") as writer:
+        with ExcelWriter(self.output_file, mode="a", if_sheet_exists="overlay") as writer:
             self.detail_table.to_excel(writer, startrow=DETAIL_ROWS_INDEX, startcol=0, index=False, header=False)
         
         self._addSummaryTable("-", total, "-", total_interest, total+total_interest)
         # Add summary table
         self._insert_formatted_rows(self.output_file, "Sheet1", SUMMARY_ROWS_INDEX, len(self.summary_table))
-        with pd.ExcelWriter(self.output_file, mode="a", if_sheet_exists="overlay") as writer:
+        with ExcelWriter(self.output_file, mode="a", if_sheet_exists="overlay") as writer:
             self.summary_table.to_excel(writer, startrow=SUMMARY_ROWS_INDEX, startcol=0, index=False, header=False)
-
-
-
-    

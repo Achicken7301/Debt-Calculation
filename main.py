@@ -1,27 +1,25 @@
-from PyQt5 import QtGui, QtCore, QtWidgets
-import requests
-import sys
+from PyQt5 import QtWidgets
+from sys import argv, exit
+from requests import get
 from views.MainWindowView import MainWindow
-import tabulate
-import openpyxl
-import os
+import os.path
 
 APP_NAME = "Debt Calculation"
 EXAMPLE_CONF_FILE = "example.conf"
-example_conf_url = "https://raw.githubusercontent.com/Achicken7301/Debt-Calculation/develop/example.conf"
-translate_url = (
+EXAMPLE_CONF_URL = "https://raw.githubusercontent.com/Achicken7301/Debt-Calculation/develop/example.conf"
+TRANSLATE_URL = (
     "https://github.com/Achicken7301/Debt-Calculation/tree/develop/translate"
 )
 
 if __name__ == "__main__":
     # Download initial files
     if not os.path.isfile(EXAMPLE_CONF_FILE):
-        example_conf_reponse = requests.get(example_conf_url)
+        example_conf_reponse = get(EXAMPLE_CONF_URL)
         if example_conf_reponse.status_code == 200:
             with open(EXAMPLE_CONF_FILE, "wb") as file:
                 file.write(example_conf_reponse.content)
 
-    app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication(argv)
     window = MainWindow()
     window.setWindowTitle(APP_NAME)
     window.show()
@@ -30,4 +28,4 @@ if __name__ == "__main__":
     # app_icon.addFile("icon/boss.png", QtCore.QSize(64, 64))
     # app.setWindowIcon(app_icon)
 
-    sys.exit(app.exec_())
+    exit(app.exec_())

@@ -1,8 +1,8 @@
-import os
-from pydoc import doc
+from os import makedirs
+import os.path
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Inches, Mm
+from docx.shared import Mm
 from pandas import DataFrame
 
 from Models.Global import *
@@ -143,10 +143,10 @@ class MyDocx:
         # Check if the folder exists
         if not os.path.exists(y_dir):
             # Create the folder if it doesn't exist
-            os.makedirs(y_dir)
+            makedirs(y_dir)
         # Check if had  have current-month directory, if not create
         if not os.path.exists(f"{y_dir}//{m_dir}"):
             # Create the folder if it doesn't exist
-            os.makedirs(f"{y_dir}//{m_dir}")
+            makedirs(f"{y_dir}//{m_dir}")
 
         self.my_docx.save(f"{y_dir}//{m_dir}/{file_name}.docx")

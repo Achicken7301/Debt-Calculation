@@ -1,5 +1,3 @@
-import PyQt5
-import PyQt5.QtCore
 from PyQt5.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PyQt5.QtWidgets import (
     QMessageBox,
@@ -7,13 +5,13 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QComboBox,
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDate
 
 # Models
 from Controller import Controller
-from Models.Docx import MyDocx
+# from Models.Docx import MyDocx
+# from Models.Markdown import MyMarkdown, Style
 from Models.Global import ErrorHandler, ExportFormat, FileFormat, Option, Section
-from Models.Markdown import MyMarkdown, Style
 from Models.MultiLangues import MultiLanguages
 
 # Main ui
@@ -22,7 +20,7 @@ from ui.main_ui_ui import Ui_MainWindow
 
 # Depencences???
 from datetime import datetime, date
-import pandas as pd
+from pandas import read_excel, read_csv, DataFrame
 
 # View
 from views.SettingsView import Settings
@@ -58,7 +56,7 @@ class MainWindow(QMainWindow):
         self.main_ui.file_generate.clicked.connect(self.file_generate_btn)
         self.main_ui.actionStore_Infos.triggered.connect(self.edit_store_info)
 
-        self.main_ui.closing_date.setDate(PyQt5.QtCore.QDate(date.today()))
+        self.main_ui.closing_date.setDate(QDate(date.today()))
 
     def edit_store_info(self):
         edit_store_infos_ui = Settings()
@@ -261,7 +259,7 @@ class MainWindow(QMainWindow):
             defaultButton=QMessageBox.Ok,
         )
 
-    def cols_format(self, df: pd.DataFrame) -> pd.DataFrame:
+    def cols_format(self, df: DataFrame) -> DataFrame:
         """This magical function will format dataframe columes
 
         Args:
@@ -408,16 +406,16 @@ class MainWindow(QMainWindow):
             type (FileFormat): .xlsx or .csv
         """
 
-        self.file_data = pd.DataFrame()
+        self.file_data = DataFrame()
         self.is_load_file = 1
 
         if type == FileFormat.XLSX:
             # print("Start loading .xlsx")
-            self.file_data = pd.read_excel(file_path)
+            self.file_data = read_excel(file_path)
 
         if type == FileFormat.CSV:
             # NOTE: This is not implement, YET
-            self.file_data = pd.read_csv(file_path)
+            self.file_data = read_csv(file_path)
 
         self.row = len(self.file_data)
         self.column = len(self.file_data.columns)

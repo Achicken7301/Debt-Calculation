@@ -1,8 +1,9 @@
-import json
+from json import load as j_load
 from Models.Global import ErrorHandler
 from Models.ProgramConfigModel import ProgramConfig
-import os
-import requests
+import os.path
+from os import makedirs
+from requests import get
 
 
 class MultiLanguages:
@@ -12,13 +13,13 @@ class MultiLanguages:
         # If no translate folder -> create one
         trans_folder = "translate"
         if not os.path.exists(trans_folder):
-            os.makedirs(trans_folder)
+            makedirs(trans_folder)
 
         # Check languaage .json
         if not os.path.isfile(f"{trans_folder}/{self.language}.json"):
             # Download from git repo
             language_json_url = f"https://raw.githubusercontent.com/Achicken7301/Debt-Calculation/develop/translate/{self.language}.json"
-            language_json_reponse = requests.get(language_json_url)
+            language_json_reponse = get(language_json_url)
             if language_json_reponse.status_code == 200:
                 with open(
                     f"{os.getcwd()}/{trans_folder}/{self.language}.json", "wb"
@@ -40,7 +41,7 @@ class MultiLanguages:
         # TODO: Find if there self.language file in translate folder, if not return FILE_NOT_FOUND
         language_file = f"translate/{my_lang}.json"
         with open(language_file, "r", encoding="utf8") as jsonfile:
-            self.trans_data = json.load(jsonfile)
+            self.trans_data = j_load(jsonfile)
 
         ErrorHandler.OK
 
